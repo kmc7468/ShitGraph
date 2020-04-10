@@ -32,6 +32,9 @@ namespace ShitGraph {
 		};
 		return functionClass;
 	}
+	ExplicitFunctionGraph* CreatePolynomial(std::vector<Scalar> coefs) {
+		return new ExplicitFunctionGraph(Polynomial(std::move(coefs)));
+	}
 }
 
 namespace ShitGraph {
@@ -69,5 +72,47 @@ namespace ShitGraph {
 			y.push_back(mSqrt);
 		};
 		return graphClass;
+	}
+	ImplicitFunctionGraph* CreateEllipse(double x, double y, double xRadius, double yRadius) {
+		return new ImplicitFunctionGraph(Ellipse(x, y, xRadius, yRadius));
+	}
+}
+
+namespace ShitGraph {
+	class CFunctionParameter final : public FunctionParameter {
+	public:
+		Scalar(*Function)(Scalar) = nullptr;
+
+	public:
+		CFunctionParameter(Scalar(*function)(Scalar)) noexcept
+			: Function(function) {}
+		CFunctionParameter(const CFunctionParameter&) = delete;
+		virtual ~CFunctionParameter() override = default;
+
+	public:
+		CFunctionParameter& operator=(const CFunctionParameter&) = delete;
+	};
+
+	ExplicitFunctionClass CFunction(Scalar(*function)(Scalar)) {
+		return CFunction(function, ContinuousFunction);
+	}
+	ExplicitFunctionClass CFunction(Scalar(*function)(Scalar), CheckContinuityFunction checkContinuity) {
+		ExplicitFunctionClass graphClass;
+		graphClass.Parameter = new CFunctionParameter(function);
+		graphClass.CheckContinuity = checkContinuity;
+		graphClass.Function = [](const FunctionParameter* parameter, Point& point) {
+			const auto cfunctionParameter = parameter->Cast<CFunctionParameter>();
+			point.Y = cfunctionParameter->Function(point.X);
+
+			const bool isValid = std::isnormal(point.Y) || point.Y == 0;
+			return isValid;
+		};
+		return graphClass;
+	}
+	ExplicitFunctionGraph* CreateCFunction(Scalar(*function)(Scalar)) {
+		return new ExplicitFunctionGraph(CFunction(function));
+	}
+	ExplicitFunctionGraph* CreateCFunction(Scalar(*function)(Scalar), CheckContinuityFunction checkContinuity) {
+		return new ExplicitFunctionGraph(CFunction(function, checkContinuity));
 	}
 }

@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+
 #include <ShitGraph/CoreType.hpp>
 #include <ShitGraph/Graph.hpp>
 #include <ShitGraph/Graphs.hpp>
@@ -5,6 +7,7 @@
 #include <ShitGraph/platform/win32/Graphic.hpp>
 #include <ShitGraph/platform/win32/Render.hpp>
 
+#include <cmath>
 #include <Windows.h>
 
 ShitGraph::Graphs g_Graphs;
@@ -22,9 +25,17 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 	Win32Render renderer(instance);
 	renderer.CreateMainWindow(WndProc);
 
-	g_Graphs.AddGraph(new ExplicitFunctionGraph(Polynomial({ 0 })));
-	g_Graphs.AddGraph(new ExplicitFunctionGraph(Polynomial({ -6, 11, -6, 1 })));
-	g_Graphs.AddGraph(new ImplicitFunctionGraph(Ellipse(0, 0, 10, 10)));
+	g_Graphs.AddGraph(CreatePolynomial({ 0 }));
+
+	g_Graphs.AddGraph(CreatePolynomial({ -6, 11, -6, 1 }));
+	g_Graphs.AddGraph(CreateEllipse(0, 0, 1, 1));
+	g_Graphs.AddGraph(CreateCFunction(std::sin));
+	g_Graphs.AddGraph(CreateCFunction(std::cos));
+	/*g_Graphs.AddGraph(CreateCFunction(std::tan, [](const Point& from, const Point& to) {
+		const Scalar aInt = from.X - std::fmod(from.X, M_PI / 2);
+		const Scalar bInt = to.X - std::fmod(to.X, M_PI / 2);
+		return aInt == bInt;
+	}));*/
 
 	const int result = renderer.Run(cmdShow);
 	Win32ShutdownGdiplus();
