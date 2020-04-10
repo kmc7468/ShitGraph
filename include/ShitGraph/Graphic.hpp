@@ -96,4 +96,51 @@ namespace ShitGraph {
 		virtual ShitGraph::SolidBrush* CreateSolidBrush(const Color& color) = 0;
 		virtual ShitGraph::Pen* CreatePen(const Color& color, Scalar width) = 0;
 	};
+
+	template<typename T>
+	class ManagedGraphicObject final {
+	private:
+		GraphicDevice* m_Device = nullptr;
+		GraphicObject* m_Object = nullptr;
+
+	public:
+		ManagedGraphicObject(GraphicDevice& device, GraphicObject* object) noexcept
+			: m_Device(&device), m_Object(object) {}
+		ManagedGraphicObject(ManagedGraphicObject&& object) noexcept
+			: m_Device(object.m_Device), m_Object(object.m_Object) {
+			object.m_Device = nullptr;
+			object.m_Object = nullptr;
+		}
+		~ManagedGraphicObject() {
+			Reset();
+		}
+
+	public:
+		ManagedGraphicObject& operator=(ManagedGraphicObject&& object) noexcept {
+			m_Device = object.m_Device;
+			m_Object = object.m_Object;
+
+			object.m_Device = nullptr;
+			object.m_Object = nullptr;
+			return *this;
+			return *this;
+		}
+		operator T*() const noexcept {
+			return static_cast<T*>(Get());
+		}
+
+	public:
+		void Reset() noexcept {
+			if (m_Device) {
+				m_Device->Delete(m_Object);
+			}
+		}
+		GraphicObject* Release() const noexcept {
+			m_Device = nullptr;
+			return m_Object;
+		}
+		GraphicObject* Get() const noexcept {
+			return m_Object;
+		}
+	};
 }
