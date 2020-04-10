@@ -33,23 +33,16 @@ namespace ShitGraph {
 }
 
 namespace ShitGraph {
-	Win32GraphicDevice::Win32GraphicDevice(HWND window, HDC dc)
-		: m_Window(window), m_Graphics(dc) {}
-
-	Rectangle Win32GraphicDevice::GetRectangle() const noexcept {
-		return m_ClientRectangle;
-	}
-	void Win32GraphicDevice::UpdateRectangle() noexcept {
-		RECT clientRectApi;
-		GetClientRect(m_Window, &clientRectApi);
-		m_ClientRectangle.LeftTop = { static_cast<double>(clientRectApi.left), static_cast<double>(clientRectApi.top) };
-		m_ClientRectangle.RightBottom = { static_cast<double>(clientRectApi.right), static_cast<double>(clientRectApi.bottom) };
+	Win32GraphicDevice::Win32GraphicDevice(HWND window, HDC dc, const ShitGraph::Rectangle& rectangle)
+		: GraphicDevice(rectangle), m_Window(window), m_Graphics(dc) {
+		m_Graphics.Clear(Gdiplus::Color::White);
+		m_Graphics.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
 	}
 
 	void Win32GraphicDevice::DrawLines(const ShitGraph::Pen* pen, const Point* points, std::size_t size) {
 		std::vector<Gdiplus::PointF> pointsGdi(size);
 		for (std::size_t i = 0; i < size; ++i) {
-			pointsGdi[i] = GdiplusObject(points[size]);
+			pointsGdi[i] = GdiplusObject(points[i]);
 		}
 
 		m_Graphics.DrawLines(static_cast<Gdiplus::Pen*>(pen->GetHandle()), pointsGdi.data(), static_cast<INT>(size));

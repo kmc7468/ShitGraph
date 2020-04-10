@@ -49,10 +49,9 @@ namespace ShitGraph {
 	private:
 		HWND m_Window;
 		Gdiplus::Graphics m_Graphics;
-		ShitGraph::Rectangle m_ClientRectangle;
 
 	public:
-		Win32GraphicDevice(HWND window, HDC dc);
+		Win32GraphicDevice(HWND window, HDC dc, const ShitGraph::Rectangle& rectangle);
 		Win32GraphicDevice(const Win32GraphicDevice&) = delete;
 		virtual ~Win32GraphicDevice() = default;
 
@@ -60,9 +59,6 @@ namespace ShitGraph {
 		Win32GraphicDevice& operator=(const Win32GraphicDevice&) = delete;
 
 	public:
-		virtual Rectangle GetRectangle() const noexcept override;
-		virtual void UpdateRectangle() noexcept override;
-
 		virtual void DrawLines(const ShitGraph::Pen* pen, const Point* points, std::size_t size) override;
 
 	protected:

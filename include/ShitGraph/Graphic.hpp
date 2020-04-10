@@ -70,9 +70,10 @@ namespace ShitGraph {
 	class GraphicDevice {
 	private:
 		std::vector<GraphicObject*> m_Objects;
+		ShitGraph::Rectangle m_Rectangle;
 
 	public:
-		GraphicDevice() noexcept = default;
+		explicit GraphicDevice(const ShitGraph::Rectangle& rectangle) noexcept;
 		GraphicDevice(const GraphicDevice&) = delete;
 		virtual ~GraphicDevice();
 
@@ -80,8 +81,7 @@ namespace ShitGraph {
 		GraphicDevice& operator=(const GraphicDevice&) = delete;
 
 	public:
-		virtual Rectangle GetRectangle() const noexcept = 0;
-		virtual void UpdateRectangle() noexcept = 0;
+		Rectangle GetRectangle() const noexcept;
 		int GetWidth() const noexcept;
 		int GetHeight() const noexcept;
 

@@ -15,9 +15,9 @@ namespace ShitGraph {
 
 namespace ShitGraph {
 	Point Graphs::GetCenter() const noexcept {
-		m_Center;
+		return m_Center;
 	}
-	void Graphs::SetSenter(const Point& newCenter) noexcept {
+	void Graphs::SetCenter(const Point& newCenter) noexcept {
 		m_Center = newCenter;
 	}
 	Scalar Graphs::GetScale() const noexcept {
@@ -43,20 +43,19 @@ namespace ShitGraph {
 	void Graphs::Render(GraphicDevice& device) {
 		const ManagedGraphicObject<Pen> graphPen(device, device.Pen({ 0, 0, 0 }, 2));
 
-		const Point origin{ 0, 0 };
-		const Point originL = Logical(device, origin);
-		const Rectangle rect = Logical(device, device.GetRectangle());
+		const Rectangle rectP = device.GetRectangle();
+		const Rectangle rect = Logical(device, rectP);
 
 		for (const Graph* const graph : m_Graphs) {
 			std::vector<std::vector<Point>> points;
 
-			Scalar prevXP;
+			Scalar prevXP = 0;
 			Vector prevYs;
 			bool prevDrawed = false;
 
-			for (int xP = 0; xP < static_cast<int>(rect.RightBottom.Y); ++xP) {
+			for (int xP = 0; xP < static_cast<int>(rectP.RightBottom.X); ++xP) {
 				const Scalar x = Logical(device, Point{ static_cast<Scalar>(xP) }).X;
-				const Vector ys = graph->Solve(x);
+				Vector ys = graph->Solve(x);
 				if (points.empty() && !ys.empty()) {
 					points.resize(ys.size());
 				}
@@ -64,7 +63,7 @@ namespace ShitGraph {
 				bool drawed = false;
 				for (std::size_t i = 0; i < ys.size(); ++i) {
 					const Scalar y = ys[i];
-					const bool shouldDraw = rect.RightBottom.Y <= y && y <= rect.RightBottom.Y;
+					const bool shouldDraw = rect.RightBottom.Y <= y && y <= rect.LeftTop.Y;
 					if (shouldDraw || prevDrawed) {
 						const Scalar yP = Physical(device, { 0, y }).Y;
 						points[i].push_back({ static_cast<Scalar>(xP), yP });
@@ -75,7 +74,7 @@ namespace ShitGraph {
 				if (!prevDrawed && drawed && xP != 0) {
 					for (std::size_t i = 0; i < prevYs.size(); ++i) {
 						const Scalar y = prevYs[i];
-						const double yP = Physical(device, { 0, yP }).Y;
+						const double yP = Physical(device, { 0, y }).Y;
 						points[i].insert(points[i].end() - 1, { prevXP, yP });
 					}
 				}
@@ -103,8 +102,8 @@ namespace ShitGraph {
 
 	Point Graphs::Logical(const GraphicDevice& device, const Point& point) const noexcept {
 		return {
-			device.GetWidth() / 2.0 + (point.X + m_Center.X) / m_Scale,
-			device.GetHeight() / 2.0 - (point.Y + m_Center.Y) / m_Scale
+			(point.X - device.GetWidth() / 2.0) * m_Scale - m_Center.X,
+			(device.GetHeight() / 2.0 - point.Y) * m_Scale - m_Center.Y,
 		};
 	}
 	Rectangle Graphs::Logical(const GraphicDevice& device, const Rectangle& rectangle) const noexcept {
@@ -115,8 +114,8 @@ namespace ShitGraph {
 	}
 	Point Graphs::Physical(const GraphicDevice& device, const Point& point) const noexcept {
 		return {
-			(point.X - device.GetWidth() / 2.0) * m_Scale - m_Center.X,
-			(device.GetHeight() / 2.0 - point.Y) * m_Scale - m_Center.Y,
+			device.GetWidth() / 2.0 + (point.X + m_Center.X) / m_Scale,
+			device.GetHeight() / 2.0 - (point.Y + m_Center.Y) / m_Scale
 		};
 	}
 }

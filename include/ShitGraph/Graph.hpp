@@ -41,7 +41,7 @@ namespace ShitGraph {
 
 	public:
 		Point GetCenter() const noexcept;
-		void SetSenter(const Point& newCenter) noexcept;
+		void SetCenter(const Point& newCenter) noexcept;
 		Scalar GetScale() const noexcept;
 		void SetScale(Scalar newScale) noexcept;
 
