@@ -1,6 +1,18 @@
 # ShitGraph
 Windows용 그래프 시각화 프로그램
 
+## 컴파일
+```
+$ git clone https://github.com/kmc7468/ShitGraph.git
+$ cd ShitGraph
+$ cmake .
+$ msbuild ShitGraph.sln /t:ALL_BUILD /p:Configuration=Release
+```
+
+## 조작법
+- **마우스 드래그**: 화면의 중심을 이동시킬 수 있습니다. (이동)
+- **마우스 휠**: 화면의 스케일을 조절할 수 있습니다. (확대/축소)
+
 ## 이미지
 <div align="center">
 	<img src="https://github.com/kmc7468/ShitGraph/blob/master/docs/Example.png" />
