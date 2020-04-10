@@ -90,7 +90,7 @@ namespace ShitGraph {
 		ShitGraph::Pen* Pen(const Color& color, Scalar width);
 		void Delete(GraphicObject* object);
 
-		virtual void DrawLines(const ShitGraph::Pen* pen, Point* points, std::size_t size) = 0;
+		virtual void DrawLines(const ShitGraph::Pen* pen, const Point* points, std::size_t size) = 0;
 
 	protected:
 		virtual ShitGraph::SolidBrush* CreateSolidBrush(const Color& color) = 0;
