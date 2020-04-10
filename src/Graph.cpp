@@ -75,7 +75,7 @@ namespace ShitGraph {
 					for (std::size_t i = 0; i < prevYs.size(); ++i) {
 						const Scalar y = prevYs[i];
 						const double yP = Physical(device, { 0, y }).Y;
-						points[i].insert(points[i].end() - 1, { prevXP, yP });
+						points[i].insert(points[i].end() - (points[i].empty() ? 0 : 1), { prevXP, yP });
 					}
 				}
 
