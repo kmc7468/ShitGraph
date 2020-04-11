@@ -19,7 +19,17 @@ namespace ShitGraph {
 		virtual void* GetHandle() const noexcept = 0;
 	};
 
-	class SolidBrush : public GraphicObject {
+	class Brush : public GraphicObject {
+	public:
+		Brush() noexcept = default;
+		Brush(const Brush&) = delete;
+		virtual ~Brush() override = default;
+
+	public:
+		Brush& operator=(const Brush&) = delete;
+	};
+
+	class SolidBrush : public Brush {
 	private:
 		Color m_Color;
 
