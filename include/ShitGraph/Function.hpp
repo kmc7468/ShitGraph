@@ -36,18 +36,19 @@ namespace ShitGraph {
 
 	public:
 		explicit FunctionGraph(const FunctionClass& functionClass) noexcept;
+		FunctionGraph(IndependentVariable independentVariable, const FunctionClass& functionClass) noexcept;
 		explicit FunctionGraph(const FunctionParameter* parameter) noexcept;
+		FunctionGraph(IndependentVariable independentVariable, const FunctionParameter* parameter) noexcept;
 		FunctionGraph(const FunctionParameter* parameter, CheckContinuityFunction checkContinuity) noexcept;
+		FunctionGraph(IndependentVariable independentVariable, const FunctionParameter* parameter, CheckContinuityFunction checkContinuity) noexcept;
 		FunctionGraph(const FunctionGraph&) = delete;
 		virtual ~FunctionGraph() override;
 
 	public:
 		FunctionGraph& operator=(const FunctionGraph&) = delete;
 
-	public:
-		virtual bool IsContinuous(Point from, Point to) const override;
-
 	protected:
+		virtual bool CheckContinuity(const Point& from, const Point& to) const override;
 		const FunctionParameter* GetParameter() const noexcept;
 	};
 
@@ -63,8 +64,11 @@ namespace ShitGraph {
 
 	public:
 		explicit ExplicitFunctionGraph(ExplicitFunctionClass graphClass) noexcept;
+		ExplicitFunctionGraph(IndependentVariable independentVariable, ExplicitFunctionClass graphClass) noexcept;
 		ExplicitFunctionGraph(const FunctionParameter* parameter, ExplicitFunction function) noexcept;
+		ExplicitFunctionGraph(IndependentVariable independentVariable, const FunctionParameter* parameter, ExplicitFunction function) noexcept;
 		ExplicitFunctionGraph(const FunctionParameter* parameter, CheckContinuityFunction checkContinuity, ExplicitFunction function) noexcept;
+		ExplicitFunctionGraph(IndependentVariable independentVariable, const FunctionParameter* parameter, CheckContinuityFunction checkContinuity, ExplicitFunction function) noexcept;
 		ExplicitFunctionGraph(const ExplicitFunctionGraph&) = delete;
 		virtual ~ExplicitFunctionGraph() override = default;
 
@@ -87,8 +91,11 @@ namespace ShitGraph {
 
 	public:
 		explicit ImplicitFunctionGraph(ImplicitFunctionClass graphClass) noexcept;
+		ImplicitFunctionGraph(IndependentVariable independentVariable, ImplicitFunctionClass graphClass) noexcept;
 		ImplicitFunctionGraph(const FunctionParameter* parameter, ImplicitFunction function) noexcept;
+		ImplicitFunctionGraph(IndependentVariable independentVariable, const FunctionParameter* parameter, ImplicitFunction function) noexcept;
 		ImplicitFunctionGraph(const FunctionParameter* parameter, CheckContinuityFunction checkContinuity, ImplicitFunction function) noexcept;
+		ImplicitFunctionGraph(IndependentVariable independentVariable, const FunctionParameter* parameter, CheckContinuityFunction checkContinuity, ImplicitFunction function) noexcept;
 		ImplicitFunctionGraph(const ImplicitFunctionGraph&) = delete;
 		virtual ~ImplicitFunctionGraph() override = default;
 

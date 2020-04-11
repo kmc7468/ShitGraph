@@ -25,9 +25,10 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 	Win32Render renderer(instance);
 	renderer.CreateMainWindow(WndProc);
 
-	g_Graphs.AddGraph(CreatePolynomial({ 0 }));
+	g_Graphs.AddGraph(CreateXAxis());
+	g_Graphs.AddGraph(CreateYAxis());
 
-	g_Graphs.AddGraph(CreatePolynomial({ -6, 11, -6, 1 }));
+	g_Graphs.AddGraph(MakeForY(CreatePolynomial({ -6, 11, -6, 1 })));
 	g_Graphs.AddGraph(CreateEllipse(0, 0, 1, 1));
 	g_Graphs.AddGraph(CreateCFunction(std::sin));
 	g_Graphs.AddGraph(CreateCFunction(std::cos));
