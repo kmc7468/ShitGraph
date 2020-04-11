@@ -69,23 +69,23 @@ namespace ShitGraph {
 		virtual void Solve(Scalar x, Vector& y) const override;
 	};
 
-	using ImplicitFunction = void(*)(const FunctionParameter* parameter, Scalar x, Vector& y);
+	using MultivaluedImplicitFunction = void(*)(const FunctionParameter* parameter, Scalar x, Vector& y);
 
-	struct ImplicitFunctionClass final : FunctionGraphClass {
-		ImplicitFunction Function = nullptr;
+	struct MultivaluedImplicitFunctionClass final : FunctionGraphClass {
+		MultivaluedImplicitFunction Function = nullptr;
 	};
 
-	class ImplicitFunctionGraph final : public FunctionGraph {
+	class MultivaluedExplicitFunctionGraph final : public FunctionGraph {
 	private:
-		ImplicitFunction m_Function = nullptr;
+		MultivaluedImplicitFunction m_Function = nullptr;
 
 	public:
-		explicit ImplicitFunctionGraph(const ImplicitFunctionClass& graphClass) noexcept;
-		ImplicitFunctionGraph(const ImplicitFunctionGraph&) = delete;
-		virtual ~ImplicitFunctionGraph() override = default;
+		explicit MultivaluedExplicitFunctionGraph(const MultivaluedImplicitFunctionClass& graphClass) noexcept;
+		MultivaluedExplicitFunctionGraph(const MultivaluedExplicitFunctionGraph&) = delete;
+		virtual ~MultivaluedExplicitFunctionGraph() override = default;
 
 	public:
-		ImplicitFunctionGraph& operator=(const ImplicitFunctionGraph&) = delete;
+		MultivaluedExplicitFunctionGraph& operator=(const MultivaluedExplicitFunctionGraph&) = delete;
 
 	protected:
 		virtual void Solve(Scalar x, Vector& y) const override;

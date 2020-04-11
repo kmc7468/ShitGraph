@@ -38,10 +38,10 @@ namespace ShitGraph {
 }
 
 namespace ShitGraph {
-	ImplicitFunctionGraph::ImplicitFunctionGraph(const ImplicitFunctionClass& graphClass) noexcept
+	MultivaluedExplicitFunctionGraph::MultivaluedExplicitFunctionGraph(const MultivaluedImplicitFunctionClass& graphClass) noexcept
 		: FunctionGraph(graphClass), m_Function(graphClass.Function) {}
 
-	void ImplicitFunctionGraph::Solve(Scalar x, Vector& y) const {
+	void MultivaluedExplicitFunctionGraph::Solve(Scalar x, Vector& y) const {
 		m_Function(GetParameter(), x, y);
 	}
 }

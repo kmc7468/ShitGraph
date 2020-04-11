@@ -47,12 +47,40 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 	g_Graphs.AddGraph(CreateEllipse(0, 0, 1, 1)->ChangeColor(RandomColor()));
 	g_Graphs.AddGraph(CreateCFunction(std::sin)->ChangeColor(RandomColor()));
 	g_Graphs.AddGraph(CreateCFunction(std::cos)->ChangeColor(RandomColor()));
+	g_Graphs.AddGraph(CreateCFunction(std::log2)->ChangeColor(RandomColor()));
+	g_Graphs.AddGraph(CreateCFunction([](Scalar x) {
+		return std::pow(2, x);
+	})->ChangeColor(RandomColor()));
+	g_Graphs.AddGraph(CreateCFunction([](Scalar x) {
+		return std::pow(0.5, x);
+	})->ChangeColor(RandomColor()));
 
-	/*g_Graphs.AddGraph(CreateCFunction(std::tan, [](const Point& from, const Point& to) {
-		const Scalar aInt = from.X - std::fmod(from.X, M_PI / 2);
-		const Scalar bInt = to.X - std::fmod(to.X, M_PI / 2);
-		return aInt == bInt;
-	}));*/
+	MultivaluedImplicitFunctionClass fClass;
+	fClass.CheckContinuity = ContinuousFunction;
+	fClass.Parameter = nullptr;
+	fClass.Color = RandomColor();
+	fClass.Function = [](const FunctionParameter*, Scalar x, Vector& y) {
+		const Scalar sqrt = std::sqrt(4 * 3 * x);
+		if (std::isnormal(sqrt) || sqrt == 0) {
+			y.push_back(sqrt);
+			y.push_back(-sqrt);
+		}
+	};
+	g_Graphs.AddGraph(new MultivaluedExplicitFunctionGraph(fClass));
+
+	g_Graphs.AddGraph(CreateCFunction([](Scalar x) {
+		Scalar y = 0.0;
+		for (int i = 0; i < 10; ++i) {
+			y += std::pow(0.5, i) * std::cos(std::pow(5, i) * M_PI * x);
+		}
+		return y;
+	})->ChangeColor(RandomColor()));
+
+	g_Graphs.AddGraph(CreateCFunction(std::tan, [](const Point& from, const Point& to) {
+		return from.Y < to.Y;
+	})->ChangeColor(RandomColor()));
+
+	/*Guarder*/
 
 	const int result = renderer.Run(cmdShow);
 	Win32ShutdownGdiplus();

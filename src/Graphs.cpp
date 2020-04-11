@@ -70,8 +70,8 @@ namespace ShitGraph {
 		EllipseParameter& operator=(const EllipseParameter&) = delete;
 	};
 
-	ImplicitFunctionClass Ellipse(double x, double y, double xRadius, double yRadius) {
-		ImplicitFunctionClass graphClass;
+	MultivaluedImplicitFunctionClass Ellipse(double x, double y, double xRadius, double yRadius) {
+		MultivaluedImplicitFunctionClass graphClass;
 		graphClass.Parameter = new EllipseParameter(x, y, xRadius, yRadius);
 		graphClass.CheckContinuity = ContinuousFunction;
 		graphClass.Function = [](const FunctionParameter* parameter, Scalar x, Vector& y) {
@@ -88,8 +88,8 @@ namespace ShitGraph {
 		};
 		return graphClass;
 	}
-	ImplicitFunctionGraph* CreateEllipse(double x, double y, double xRadius, double yRadius) {
-		return new ImplicitFunctionGraph(Ellipse(x, y, xRadius, yRadius));
+	MultivaluedExplicitFunctionGraph* CreateEllipse(double x, double y, double xRadius, double yRadius) {
+		return new MultivaluedExplicitFunctionGraph(Ellipse(x, y, xRadius, yRadius));
 	}
 }
 
