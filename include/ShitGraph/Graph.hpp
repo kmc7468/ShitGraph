@@ -46,10 +46,10 @@ namespace ShitGraph {
 	private:
 		std::vector<Graph*> m_Graphs;
 		Point m_Center;
-		Scalar m_Scale = 0.25;
+		Scalar m_Scale;
 
 	public:
-		Graphs() noexcept = default;
+		Graphs(Scalar scale = 0.262144) noexcept;
 		Graphs(const Graphs&) = delete;
 		~Graphs() = default;
 
@@ -71,6 +71,10 @@ namespace ShitGraph {
 	private:
 		std::vector<std::vector<Point>> GetPoints(const GraphicDevice& device, const Rectangle& rect, const Rectangle& rectP, const Graph* graph) const;
 		bool ShouldDraw(const Rectangle& rect, const Graph* graph, Scalar dep) const noexcept;
+
+	public:
+		Point Logical(int width, int height, const Point& point) const noexcept;
+		Point Physical(int width, int height, const Point& point) const noexcept;
 
 	private:
 		Point Logical(const GraphicDevice& device, const Point& point) const noexcept;

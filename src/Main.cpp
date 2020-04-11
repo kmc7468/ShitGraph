@@ -10,6 +10,10 @@
 #include <cmath>
 #include <Windows.h>
 
+// Constants
+constexpr ShitGraph::Scalar INITIALLY_SCALE = 0.262144;
+constexpr ShitGraph::Scalar MAGNIFICATION = 1.25;
+
 // Variables
 ShitGraph::Graphs g_Graphs;
 
@@ -17,6 +21,8 @@ POINT g_MousePos;
 bool g_IsMoving = false;
 
 // Function declarations
+RECT GetClientRectangle(HWND handle);
+
 LRESULT CALLBACK WndProc(HWND handle, UINT message, WPARAM wParam, LPARAM lParam);
 
 void Paint(HWND handle);
@@ -54,6 +60,12 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 	return result;
 }
 
+RECT GetClientRectangle(HWND handle) {
+	RECT clientRectApi;
+	GetClientRect(handle, &clientRectApi);
+	return clientRectApi;
+}
+
 LRESULT CALLBACK WndProc(HWND handle, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 	case WM_PAINT: return Paint(handle), 0;
@@ -70,8 +82,7 @@ void Paint(HWND handle) {
 	PAINTSTRUCT ps;
 	const HDC dc = BeginPaint(handle, &ps);
 
-	RECT clientRectApi;
-	GetClientRect(handle, &clientRectApi);
+	const RECT clientRectApi = GetClientRectangle(handle);
 	const ShitGraph::Rectangle clientRect = {
 		{ static_cast<ShitGraph::Scalar>(clientRectApi.left), static_cast<ShitGraph::Scalar>(clientRectApi.top) },
 		{ static_cast<ShitGraph::Scalar>(clientRectApi.right), static_cast<ShitGraph::Scalar>(clientRectApi.bottom) }
@@ -107,17 +118,29 @@ void MouseMove(HWND handle, LPARAM lParam) {
 		g_Graphs.SetCenter({
 			center.X - (g_MousePos.x - x) * g_Graphs.GetScale(),
 			center.Y + (g_MousePos.y - y) * g_Graphs.GetScale()
-			});
+		});
 		InvalidateRect(handle, nullptr, true);
 	}
 	g_MousePos.x = x;
 	g_MousePos.y = y;
 }
 void MouseWheel(HWND handle, WPARAM	wParam) {
-	if (static_cast<SHORT>(HIWORD(wParam)) > 0) {
-		g_Graphs.SetScale(g_Graphs.GetScale() / 2);
-	} else {
-		g_Graphs.SetScale(g_Graphs.GetScale() * 2);
+	const RECT clientRectApi = GetClientRectangle(handle);
+	const ShitGraph::Point mouse = g_Graphs.Logical(clientRectApi.right, clientRectApi.bottom,
+		{ static_cast<ShitGraph::Scalar>(g_MousePos.x), static_cast<ShitGraph::Scalar>(g_MousePos.y) });
+
+	const ShitGraph::Scalar delta = static_cast<SHORT>(HIWORD(wParam)) > 0 ? 1 / MAGNIFICATION : MAGNIFICATION;
+	g_Graphs.SetScale(g_Graphs.GetScale() * delta);
+
+	if (!(LOWORD(wParam) & MK_CONTROL)) {
+		const ShitGraph::Point newMouse = g_Graphs.Logical(clientRectApi.right, clientRectApi.bottom,
+			{ static_cast<ShitGraph::Scalar>(g_MousePos.x), static_cast<ShitGraph::Scalar>(g_MousePos.y) });
+		const ShitGraph::Point center = g_Graphs.GetCenter();
+		g_Graphs.SetCenter({
+			center.X + (newMouse.X - mouse.X) / delta,
+			center.Y + (newMouse.Y - mouse.Y) / delta,
+		});
 	}
+
 	InvalidateRect(handle, nullptr, true);
 }

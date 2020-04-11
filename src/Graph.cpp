@@ -39,6 +39,8 @@ namespace ShitGraph {
 }
 
 namespace ShitGraph {
+	Graphs::Graphs(Scalar scale) noexcept
+		: m_Scale(scale) {}
 	Point Graphs::GetCenter() const noexcept {
 		return m_Center;
 	}
@@ -135,11 +137,21 @@ namespace ShitGraph {
 		else return rect.LeftTop.X <= dep && dep <= rect.RightBottom.X;
 	}
 
-	Point Graphs::Logical(const GraphicDevice& device, const Point& point) const noexcept {
+	Point Graphs::Logical(int width, int height, const Point& point) const noexcept {
 		return {
-			(point.X - device.GetWidth() / 2.0) * m_Scale - m_Center.X,
-			(device.GetHeight() / 2.0 - point.Y) * m_Scale - m_Center.Y,
+			(point.X - width / 2.0) * m_Scale - m_Center.X,
+			(height / 2.0 - point.Y) * m_Scale - m_Center.Y,
 		};
+	}
+	Point Graphs::Physical(int width, int height, const Point& point) const noexcept {
+		return {
+			width / 2.0 + (point.X + m_Center.X) / m_Scale,
+			height / 2.0 - (point.Y + m_Center.Y) / m_Scale
+		};
+	}
+
+	Point Graphs::Logical(const GraphicDevice& device, const Point& point) const noexcept {
+		return Logical(device.GetWidth(), device.GetHeight(), point);
 	}
 	Rectangle Graphs::Logical(const GraphicDevice& device, const Rectangle& rectangle) const noexcept {
 		return {
@@ -148,10 +160,7 @@ namespace ShitGraph {
 		};
 	}
 	Point Graphs::Physical(const GraphicDevice& device, const Point& point) const noexcept {
-		return {
-			device.GetWidth() / 2.0 + (point.X + m_Center.X) / m_Scale,
-			device.GetHeight() / 2.0 - (point.Y + m_Center.Y) / m_Scale
-		};
+		return Physical(device.GetWidth(), device.GetHeight(), point);
 	}
 
 	Scalar Graphs::Independent(const Graph* graph, const Point& point) const noexcept {
