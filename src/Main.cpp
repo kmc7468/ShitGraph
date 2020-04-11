@@ -55,7 +55,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 		return std::pow(0.5, x);
 	})->ChangeColor(RandomColor()));
 
-	MultivaluedImplicitFunctionClass fClass;
+	MultivaluedExplicitFunctionClass fClass;
 	fClass.CheckContinuity = ContinuousFunction;
 	fClass.Parameter = nullptr;
 	fClass.Color = RandomColor();

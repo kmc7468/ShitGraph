@@ -38,7 +38,7 @@ namespace ShitGraph {
 }
 
 namespace ShitGraph {
-	MultivaluedExplicitFunctionGraph::MultivaluedExplicitFunctionGraph(const MultivaluedImplicitFunctionClass& graphClass) noexcept
+	MultivaluedExplicitFunctionGraph::MultivaluedExplicitFunctionGraph(const MultivaluedExplicitFunctionClass& graphClass) noexcept
 		: FunctionGraph(graphClass), m_Function(graphClass.Function) {}
 
 	void MultivaluedExplicitFunctionGraph::Solve(Scalar x, Vector& y) const {

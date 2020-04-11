@@ -12,7 +12,7 @@ namespace ShitGraph {
 
 	ExplicitFunctionClass Polynomial(std::vector<Scalar> coefs);
 	ExplicitFunctionGraph* CreatePolynomial(std::vector<Scalar> coefs);
-	MultivaluedImplicitFunctionClass Ellipse(double x, double y, double xRadius, double yRadius);
+	MultivaluedExplicitFunctionClass Ellipse(double x, double y, double xRadius, double yRadius);
 	MultivaluedExplicitFunctionGraph* CreateEllipse(double x, double y, double xRadius, double yRadius);
 
 	ExplicitFunctionClass CFunction(Scalar(*function)(Scalar));
