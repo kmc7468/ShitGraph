@@ -19,16 +19,16 @@ $ msbuild ShitGraph.sln /t:ALL_BUILD /p:Configuration=Release
 	<img src="https://github.com/kmc7468/ShitGraph/blob/master/docs/Example1.png" />
 </div>
 
-- ![equation](https://latex.codecogs.com/gif.latex?y%3D%28x-1%29%28x-2%29%28x-3%29)
-- ![equation](https://latex.codecogs.com/gif.latex?y%3D%5Csin%20x)
-- ![equation](https://latex.codecogs.com/gif.latex?y%3D%5Ccos%20x)
-- ![equation](https://latex.codecogs.com/gif.latex?x%5E2&plus;y%5E2%3D1)
+- ![equation](https://latex.codecogs.com/svg.latex?y%3D%28x-1%29%28x-2%29%28x-3%29)
+- ![equation](https://latex.codecogs.com/svg.latex?y%3D%5Csin%20x)
+- ![equation](https://latex.codecogs.com/svg.latex?y%3D%5Ccos%20x)
+- ![equation](https://latex.codecogs.com/svg.latex?x%5E2&plus;y%5E2%3D1)
 
 <div align="center">
 	<img src="https://github.com/kmc7468/ShitGraph/blob/master/docs/Example2.png" />
 </div>
 
-- ![equation](https://latex.codecogs.com/gif.latex?%5Csum%5E%7B100%7D_%7Bn%3D0%7D0.5%5En%5Ccos%283%5En%5Cpi%20x%29)
+- ![equation](https://latex.codecogs.com/svg.latex?%5Csum_%7Bn%3D0%7D%5E%7B100%7D0.5%5En%5Ccos%283%5En%5Cpi%20x%29)
 
 ## 라이선스
 - [MIT 라이선스](https://github.com/kmc7468/ShitGraph/blob/master/LICENSE)의 보호를 받습니다.
