@@ -6,7 +6,7 @@
 
 namespace ShitGraph {
 	Graph::Graph(const GraphClass& graphClass) noexcept
-		: m_IndependentVariable(graphClass.IndependentVariable), m_Color(graphClass.Color) {}
+		: GraphClass(graphClass) {}
 
 	Vector Graph::Solve(Scalar independent) const {
 		Vector dependent;
@@ -14,35 +14,25 @@ namespace ShitGraph {
 		return dependent;
 	}
 	bool Graph::IsContinuous(Point from, Point to) const {
-		if (m_IndependentVariable == IndependentVariable::Y) {
+		if (IndependentVariable == ShitGraph::IndependentVariable::Y) {
 			std::swap(from.X, from.Y);
 			std::swap(to.X, to.Y);
 		}
 		return CheckContinuity(from, to);
 	}
-	IndependentVariable Graph::GetIndependentVariable() const noexcept {
-		return m_IndependentVariable;
+
+	Graph* Graph::MakeForY() noexcept {
+		return ShitGraph::MakeForY(*this), this;
 	}
-	Graph* Graph::SetIndependentVariable(IndependentVariable newIndependentVariable) noexcept {
-		m_IndependentVariable = newIndependentVariable;
-		return this;
+	Graph* Graph::MakeForX() noexcept {
+		return ShitGraph::MakeForX(*this), this;
 	}
 
-	Color Graph::GetColor() const noexcept {
-		return m_Color;
+	Graph* Graph::ChangeColor(ShitGraph::Color newColor) noexcept {
+		return ShitGraph::ChangeColor(*this, newColor), this;
 	}
-	Graph* Graph::SetColor(Color newColor) noexcept {
-		m_Color = newColor;
-		return this;
-	}
-
-	Graph* MakeForY(Graph* graph) noexcept {
-		assert(graph != nullptr);
-		return graph->SetIndependentVariable(IndependentVariable::Y), graph;
-	}
-	Graph* MakeForX(Graph* graph) noexcept {
-		assert(graph != nullptr);
-		return graph->SetIndependentVariable(IndependentVariable::X), graph;
+	Graph* Graph::ChangeWidth(Scalar newWidth) noexcept {
+		return ShitGraph::ChangeWidth(*this, newWidth), this;
 	}
 }
 
@@ -80,7 +70,7 @@ namespace ShitGraph {
 		const Rectangle rect = Logical(device, rectP);
 
 		for (const Graph* const graph : m_Graphs) {
-			const ManagedGraphicObject<Pen> graphPen(device, device.Pen(graph->GetColor(), 3));
+			const ManagedGraphicObject<Pen> graphPen(device, device.Pen(graph->Color, graph->Width));
 			const std::vector<std::vector<Point>> points = GetPoints(device, rect, rectP, graph);
 
 			for (const auto& area : points) {
@@ -141,7 +131,7 @@ namespace ShitGraph {
 		return points;
 	}
 	bool Graphs::ShouldDraw(const Rectangle& rect, const Graph* graph, Scalar dep) const noexcept {
-		if (graph->GetIndependentVariable() == IndependentVariable::X) return rect.RightBottom.Y <= dep && dep <= rect.LeftTop.Y;
+		if (graph->IndependentVariable == IndependentVariable::X) return rect.RightBottom.Y <= dep && dep <= rect.LeftTop.Y;
 		else return rect.LeftTop.X <= dep && dep <= rect.RightBottom.X;
 	}
 
@@ -172,20 +162,20 @@ namespace ShitGraph {
 	}
 
 	Scalar Graphs::Independent(const Graph* graph, const Point& point) const noexcept {
-		return graph->GetIndependentVariable() == IndependentVariable::X ? point.X : point.Y;
+		return graph->IndependentVariable == IndependentVariable::X ? point.X : point.Y;
 	}
 	Scalar Graphs::Dependent(const Graph* graph, const Point& point) const noexcept {
-		return graph->GetIndependentVariable() == IndependentVariable::Y ? point.X : point.Y;
+		return graph->IndependentVariable == IndependentVariable::Y ? point.X : point.Y;
 	}
 	Point Graphs::XY(const Graph* graph, const Point& point) const noexcept {
-		return graph->GetIndependentVariable() == IndependentVariable::X ? point : Point{ point.Y, point.X };
+		return graph->IndependentVariable == IndependentVariable::X ? point : Point{ point.Y, point.X };
 	}
 	Scalar Graphs::LogicalIndependent(const GraphicDevice& device, const Graph* graph, Scalar independent) const noexcept {
 		return Independent(graph, Logical(device,
-			graph->GetIndependentVariable() == IndependentVariable::X ? Point{ independent, 0 } : Point{ 0, independent }));
+			graph->IndependentVariable == IndependentVariable::X ? Point{ independent, 0 } : Point{ 0, independent }));
 	}
 	Scalar Graphs::PhysicalDependent(const GraphicDevice& device, const Graph* graph, Scalar dependent) const noexcept {
 		return Dependent(graph, Physical(device,
-			graph->GetIndependentVariable() == IndependentVariable::X ? Point{ 0, dependent } : Point{ dependent, 0 }));
+			graph->IndependentVariable == IndependentVariable::X ? Point{ 0, dependent } : Point{ dependent, 0 }));
 	}
 }

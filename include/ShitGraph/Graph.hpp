@@ -19,27 +19,27 @@ namespace ShitGraph {
 		ShitGraph::IndependentVariable IndependentVariable = IndependentVariable::X;
 
 		ShitGraph::Color Color;
+		Scalar Width = 2;
 	};
 
 	template<typename T>
-	std::enable_if_t<std::is_base_of_v<GraphClass, T>, T&&> MakeForY(T&& graphClass) noexcept {
+	std::enable_if_t<std::is_base_of_v<GraphClass, std::decay_t<T>>, T&&> MakeForY(T&& graphClass) noexcept {
 		return graphClass.IndependentVariable = IndependentVariable::Y, std::forward<T>(graphClass);
 	}
 	template<typename T>
-	std::enable_if_t<std::is_base_of_v<GraphClass, T>, T&&> MakeForX(T&& graphClass) noexcept {
+	std::enable_if_t<std::is_base_of_v<GraphClass, std::decay_t<T>>, T&&> MakeForX(T&& graphClass) noexcept {
 		return graphClass.IndependentVariable = IndependentVariable::X, std::forward<T>(graphClass);
 	}
 	template<typename T>
-	std::enable_if_t<std::is_base_of_v<GraphClass, T>, T&&> ChangeColor(T&& graphClass, Color color) noexcept {
+	std::enable_if_t<std::is_base_of_v<GraphClass, std::decay_t<T>>, T&&> ChangeColor(T&& graphClass, Color color) noexcept {
 		return graphClass.Color = color, std::forward<T>(graphClass);
 	}
+	template<typename T>
+	std::enable_if_t<std::is_base_of_v<GraphClass, std::decay_t<T>>, T&&> ChangeWidth(T&& graphClass, Scalar width) noexcept {
+		return graphClass.Width = width, std::forward<T>(graphClass);
+	}
 
-	class Graph {
-	private:
-		IndependentVariable m_IndependentVariable;
-
-		Color m_Color;
-
+	class Graph : public GraphClass {
 	public:
 		explicit Graph(const GraphClass& graphClass) noexcept;
 		Graph(const Graph&) = delete;
@@ -51,19 +51,17 @@ namespace ShitGraph {
 	public:
 		Vector Solve(Scalar independent) const;
 		bool IsContinuous(Point from, Point to) const;
-		IndependentVariable GetIndependentVariable() const noexcept;
-		Graph* SetIndependentVariable(IndependentVariable newIndependentVariable) noexcept;
 
-		Color GetColor() const noexcept;
-		Graph* SetColor(Color newColor) noexcept;
+		Graph* MakeForY() noexcept;
+		Graph* MakeForX() noexcept;
+
+		Graph* ChangeColor(ShitGraph::Color newColor) noexcept;
+		Graph* ChangeWidth(Scalar newWidth) noexcept;
 
 	protected:
 		virtual void Solve(Scalar x, Vector& y) const = 0;
 		virtual bool CheckContinuity(const Point& from, const Point& to) const = 0;
 	};
-
-	Graph* MakeForY(Graph* graph) noexcept;
-	Graph* MakeForX(Graph* graph) noexcept;
 }
 
 namespace ShitGraph {

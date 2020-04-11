@@ -5,7 +5,7 @@
 
 namespace ShitGraph {
 	ExplicitFunctionClass XAxis() {
-		return Polynomial({ 0 });
+		return ChangeWidth(Polynomial({ 0 }), 2.5);
 	}
 	ExplicitFunctionClass YAxis() {
 		return MakeForY(XAxis());

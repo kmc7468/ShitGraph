@@ -12,7 +12,7 @@
 
 // Constants
 constexpr ShitGraph::Scalar INITIALLY_SCALE = 0.262144;
-constexpr ShitGraph::Scalar MAGNIFICATION = 1.25;
+constexpr ShitGraph::Scalar MAGNIFICATION = 1 / 0.75;
 
 // Variables
 ShitGraph::Graphs g_Graphs;
@@ -43,10 +43,10 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 	g_Graphs.AddGraph(CreateXAxis());
 	g_Graphs.AddGraph(CreateYAxis());
 
-	g_Graphs.AddGraph(CreatePolynomial({ -6, 11, -6, 1 })->SetColor(RandomColor()));
-	g_Graphs.AddGraph(CreateEllipse(0, 0, 1, 1)->SetColor(RandomColor()));
-	g_Graphs.AddGraph(CreateCFunction(std::sin)->SetColor(RandomColor()));
-	g_Graphs.AddGraph(CreateCFunction(std::cos)->SetColor(RandomColor()));
+	g_Graphs.AddGraph(CreatePolynomial({ -6, 11, -6, 1 })->ChangeColor(RandomColor()));
+	g_Graphs.AddGraph(CreateEllipse(0, 0, 1, 1)->ChangeColor(RandomColor()));
+	g_Graphs.AddGraph(CreateCFunction(std::sin)->ChangeColor(RandomColor()));
+	g_Graphs.AddGraph(CreateCFunction(std::cos)->ChangeColor(RandomColor()));
 
 	/*g_Graphs.AddGraph(CreateCFunction(std::tan, [](const Point& from, const Point& to) {
 		const Scalar aInt = from.X - std::fmod(from.X, M_PI / 2);
