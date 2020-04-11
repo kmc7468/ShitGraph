@@ -4,6 +4,18 @@
 #include <utility>
 
 namespace ShitGraph {
+	ExplicitFunctionClass Axis() {
+		return Polynomial({ 0 });
+	}
+	ExplicitFunctionGraph* CreateXAxis() {
+		return new ExplicitFunctionGraph(Axis());
+	}
+	ExplicitFunctionGraph* CreateYAxis() {
+		return new ExplicitFunctionGraph(IndependentVariable::Y, Axis());
+	}
+}
+
+namespace ShitGraph {
 	class PolynomialFunctionParameter final : public FunctionParameter {
 	public:
 		std::vector<Scalar> Coefficients;

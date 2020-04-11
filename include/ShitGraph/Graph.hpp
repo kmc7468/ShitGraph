@@ -30,11 +30,15 @@ namespace ShitGraph {
 		Vector Solve(Scalar independent) const;
 		bool IsContinuous(Point from, Point to) const;
 		IndependentVariable GetIndependentVariable() const noexcept;
+		void SetIndependentVariable(IndependentVariable newIndependentVariable) noexcept;
 
 	protected:
 		virtual void Solve(Scalar x, Vector& y) const = 0;
 		virtual bool CheckContinuity(const Point& from, const Point& to) const = 0;
 	};
+
+	Graph* MakeForY(Graph* graph) noexcept;
+	Graph* MakeForX(Graph* graph) noexcept;
 }
 
 namespace ShitGraph {

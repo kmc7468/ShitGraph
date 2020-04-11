@@ -24,6 +24,18 @@ namespace ShitGraph {
 	IndependentVariable Graph::GetIndependentVariable() const noexcept {
 		return m_IndependentVariable;
 	}
+	void Graph::SetIndependentVariable(IndependentVariable newIndependentVariable) noexcept {
+		m_IndependentVariable = newIndependentVariable;
+	}
+
+	Graph* MakeForY(Graph* graph) noexcept {
+		assert(graph != nullptr);
+		return graph->SetIndependentVariable(IndependentVariable::Y), graph;
+	}
+	Graph* MakeForX(Graph* graph) noexcept {
+		assert(graph != nullptr);
+		return graph->SetIndependentVariable(IndependentVariable::X), graph;
+	}
 }
 
 namespace ShitGraph {
