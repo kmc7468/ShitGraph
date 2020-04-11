@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <vector>
 
 namespace ShitGraph {
@@ -13,4 +14,14 @@ namespace ShitGraph {
 	struct Rectangle final {
 		Point LeftTop, RightBottom;
 	};
+}
+
+namespace ShitGraph {
+	struct Color final {
+		std::uint8_t R = 0;
+		std::uint8_t G = 0;
+		std::uint8_t B = 0;
+	};
+
+	Color RandomColor() noexcept;
 }

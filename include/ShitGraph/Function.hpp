@@ -24,7 +24,7 @@ namespace ShitGraph {
 
 	bool ContinuousFunction(const Point& from, const Point& to);
 
-	struct FunctionClass {
+	struct FunctionGraphClass : GraphClass {
 		const FunctionParameter* Parameter = nullptr;
 		CheckContinuityFunction CheckContinuity = nullptr;
 	};
@@ -35,12 +35,7 @@ namespace ShitGraph {
 		CheckContinuityFunction m_CheckContinuity = nullptr;
 
 	public:
-		explicit FunctionGraph(const FunctionClass& functionClass) noexcept;
-		FunctionGraph(IndependentVariable independentVariable, const FunctionClass& functionClass) noexcept;
-		explicit FunctionGraph(const FunctionParameter* parameter) noexcept;
-		FunctionGraph(IndependentVariable independentVariable, const FunctionParameter* parameter) noexcept;
-		FunctionGraph(const FunctionParameter* parameter, CheckContinuityFunction checkContinuity) noexcept;
-		FunctionGraph(IndependentVariable independentVariable, const FunctionParameter* parameter, CheckContinuityFunction checkContinuity) noexcept;
+		explicit FunctionGraph(const FunctionGraphClass& graphClass) noexcept;
 		FunctionGraph(const FunctionGraph&) = delete;
 		virtual ~FunctionGraph() override;
 
@@ -54,7 +49,7 @@ namespace ShitGraph {
 
 	using ExplicitFunction = bool(*)(const FunctionParameter* parameter, Point& point);
 
-	struct ExplicitFunctionClass final : FunctionClass {
+	struct ExplicitFunctionClass final : FunctionGraphClass {
 		ExplicitFunction Function = nullptr;
 	};
 
@@ -63,12 +58,7 @@ namespace ShitGraph {
 		ExplicitFunction m_Function = nullptr;
 
 	public:
-		explicit ExplicitFunctionGraph(ExplicitFunctionClass graphClass) noexcept;
-		ExplicitFunctionGraph(IndependentVariable independentVariable, ExplicitFunctionClass graphClass) noexcept;
-		ExplicitFunctionGraph(const FunctionParameter* parameter, ExplicitFunction function) noexcept;
-		ExplicitFunctionGraph(IndependentVariable independentVariable, const FunctionParameter* parameter, ExplicitFunction function) noexcept;
-		ExplicitFunctionGraph(const FunctionParameter* parameter, CheckContinuityFunction checkContinuity, ExplicitFunction function) noexcept;
-		ExplicitFunctionGraph(IndependentVariable independentVariable, const FunctionParameter* parameter, CheckContinuityFunction checkContinuity, ExplicitFunction function) noexcept;
+		explicit ExplicitFunctionGraph(const ExplicitFunctionClass& graphClass) noexcept;
 		ExplicitFunctionGraph(const ExplicitFunctionGraph&) = delete;
 		virtual ~ExplicitFunctionGraph() override = default;
 
@@ -81,7 +71,7 @@ namespace ShitGraph {
 
 	using ImplicitFunction = void(*)(const FunctionParameter* parameter, Scalar x, Vector& y);
 
-	struct ImplicitFunctionClass final : FunctionClass {
+	struct ImplicitFunctionClass final : FunctionGraphClass {
 		ImplicitFunction Function = nullptr;
 	};
 
@@ -90,12 +80,7 @@ namespace ShitGraph {
 		ImplicitFunction m_Function = nullptr;
 
 	public:
-		explicit ImplicitFunctionGraph(ImplicitFunctionClass graphClass) noexcept;
-		ImplicitFunctionGraph(IndependentVariable independentVariable, ImplicitFunctionClass graphClass) noexcept;
-		ImplicitFunctionGraph(const FunctionParameter* parameter, ImplicitFunction function) noexcept;
-		ImplicitFunctionGraph(IndependentVariable independentVariable, const FunctionParameter* parameter, ImplicitFunction function) noexcept;
-		ImplicitFunctionGraph(const FunctionParameter* parameter, CheckContinuityFunction checkContinuity, ImplicitFunction function) noexcept;
-		ImplicitFunctionGraph(IndependentVariable independentVariable, const FunctionParameter* parameter, CheckContinuityFunction checkContinuity, ImplicitFunction function) noexcept;
+		explicit ImplicitFunctionGraph(const ImplicitFunctionClass& graphClass) noexcept;
 		ImplicitFunctionGraph(const ImplicitFunctionGraph&) = delete;
 		virtual ~ImplicitFunctionGraph() override = default;
 

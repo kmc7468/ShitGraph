@@ -5,9 +5,10 @@
 #include <vector>
 
 namespace ShitGraph {
-	ExplicitFunctionClass Axis();
-	ExplicitFunctionGraph* CreateXAxis();
-	ExplicitFunctionGraph* CreateYAxis();
+	ExplicitFunctionClass XAxis();
+	ExplicitFunctionClass YAxis();
+	Graph* CreateXAxis();
+	Graph* CreateYAxis();
 
 	ExplicitFunctionClass Polynomial(std::vector<Scalar> coefs);
 	ExplicitFunctionGraph* CreatePolynomial(std::vector<Scalar> coefs);

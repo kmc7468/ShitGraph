@@ -3,11 +3,10 @@
 #include <algorithm>
 #include <cassert>
 #include <memory>
-#include <utility>
 
 namespace ShitGraph {
-	Graph::Graph(IndependentVariable independentVariable) noexcept
-		: m_IndependentVariable(independentVariable) {}
+	Graph::Graph(const GraphClass& graphClass) noexcept
+		: m_IndependentVariable(graphClass.IndependentVariable), m_Color(graphClass.Color) {}
 
 	Vector Graph::Solve(Scalar independent) const {
 		Vector dependent;
@@ -24,8 +23,17 @@ namespace ShitGraph {
 	IndependentVariable Graph::GetIndependentVariable() const noexcept {
 		return m_IndependentVariable;
 	}
-	void Graph::SetIndependentVariable(IndependentVariable newIndependentVariable) noexcept {
+	Graph* Graph::SetIndependentVariable(IndependentVariable newIndependentVariable) noexcept {
 		m_IndependentVariable = newIndependentVariable;
+		return this;
+	}
+
+	Color Graph::GetColor() const noexcept {
+		return m_Color;
+	}
+	Graph* Graph::SetColor(Color newColor) noexcept {
+		m_Color = newColor;
+		return this;
 	}
 
 	Graph* MakeForY(Graph* graph) noexcept {
@@ -68,13 +76,13 @@ namespace ShitGraph {
 	}
 
 	void Graphs::Render(GraphicDevice& device) const {
-		const ManagedGraphicObject<Pen> graphPen(device, device.Pen({ 0, 0, 0 }, 2));
-
 		const Rectangle rectP = device.GetRectangle();
 		const Rectangle rect = Logical(device, rectP);
 
 		for (const Graph* const graph : m_Graphs) {
+			const ManagedGraphicObject<Pen> graphPen(device, device.Pen(graph->GetColor(), 3));
 			const std::vector<std::vector<Point>> points = GetPoints(device, rect, rectP, graph);
+
 			for (const auto& area : points) {
 				for (std::size_t begin = 0, i = 0; i < area.size(); ++i) {
 					if (i == area.size() - 1) {

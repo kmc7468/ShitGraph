@@ -3,16 +3,7 @@
 #include <ShitGraph/CoreType.hpp>
 
 #include <cstddef>
-#include <cstdint>
 #include <vector>
-
-namespace ShitGraph {
-	struct Color final {
-		std::uint8_t R = 0;
-		std::uint8_t G = 0;
-		std::uint8_t B = 0;
-	};
-}
 
 namespace ShitGraph {
 	class GraphicObject {

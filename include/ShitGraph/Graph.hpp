@@ -3,6 +3,8 @@
 #include <ShitGraph/CoreType.hpp>
 #include <ShitGraph/Graphic.hpp>
 
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace ShitGraph {
@@ -13,13 +15,33 @@ namespace ShitGraph {
 }
 
 namespace ShitGraph {
+	struct GraphClass {
+		ShitGraph::IndependentVariable IndependentVariable = IndependentVariable::X;
+
+		ShitGraph::Color Color;
+	};
+
+	template<typename T>
+	std::enable_if_t<std::is_base_of_v<GraphClass, T>, T&&> MakeForY(T&& graphClass) noexcept {
+		return graphClass.IndependentVariable = IndependentVariable::Y, std::forward<T>(graphClass);
+	}
+	template<typename T>
+	std::enable_if_t<std::is_base_of_v<GraphClass, T>, T&&> MakeForX(T&& graphClass) noexcept {
+		return graphClass.IndependentVariable = IndependentVariable::X, std::forward<T>(graphClass);
+	}
+	template<typename T>
+	std::enable_if_t<std::is_base_of_v<GraphClass, T>, T&&> ChangeColor(T&& graphClass, Color color) noexcept {
+		return graphClass.Color = color, std::forward<T>(graphClass);
+	}
+
 	class Graph {
 	private:
-		IndependentVariable m_IndependentVariable = IndependentVariable::X;
+		IndependentVariable m_IndependentVariable;
+
+		Color m_Color;
 
 	public:
-		Graph() noexcept = default;
-		explicit Graph(IndependentVariable independentVariable) noexcept;
+		explicit Graph(const GraphClass& graphClass) noexcept;
 		Graph(const Graph&) = delete;
 		virtual ~Graph() = default;
 
@@ -30,7 +52,10 @@ namespace ShitGraph {
 		Vector Solve(Scalar independent) const;
 		bool IsContinuous(Point from, Point to) const;
 		IndependentVariable GetIndependentVariable() const noexcept;
-		void SetIndependentVariable(IndependentVariable newIndependentVariable) noexcept;
+		Graph* SetIndependentVariable(IndependentVariable newIndependentVariable) noexcept;
+
+		Color GetColor() const noexcept;
+		Graph* SetColor(Color newColor) noexcept;
 
 	protected:
 		virtual void Solve(Scalar x, Vector& y) const = 0;

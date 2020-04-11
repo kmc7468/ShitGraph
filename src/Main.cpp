@@ -43,10 +43,10 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 	g_Graphs.AddGraph(CreateXAxis());
 	g_Graphs.AddGraph(CreateYAxis());
 
-	g_Graphs.AddGraph(CreatePolynomial({ -6, 11, -6, 1 }));
-	g_Graphs.AddGraph(CreateEllipse(0, 0, 1, 1));
-	g_Graphs.AddGraph(CreateCFunction(std::sin));
-	g_Graphs.AddGraph(CreateCFunction(std::cos));
+	g_Graphs.AddGraph(CreatePolynomial({ -6, 11, -6, 1 })->SetColor(RandomColor()));
+	g_Graphs.AddGraph(CreateEllipse(0, 0, 1, 1)->SetColor(RandomColor()));
+	g_Graphs.AddGraph(CreateCFunction(std::sin)->SetColor(RandomColor()));
+	g_Graphs.AddGraph(CreateCFunction(std::cos)->SetColor(RandomColor()));
 
 	/*g_Graphs.AddGraph(CreateCFunction(std::tan, [](const Point& from, const Point& to) {
 		const Scalar aInt = from.X - std::fmod(from.X, M_PI / 2);

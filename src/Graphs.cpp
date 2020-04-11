@@ -4,14 +4,17 @@
 #include <utility>
 
 namespace ShitGraph {
-	ExplicitFunctionClass Axis() {
+	ExplicitFunctionClass XAxis() {
 		return Polynomial({ 0 });
 	}
-	ExplicitFunctionGraph* CreateXAxis() {
-		return new ExplicitFunctionGraph(Axis());
+	ExplicitFunctionClass YAxis() {
+		return MakeForY(XAxis());
 	}
-	ExplicitFunctionGraph* CreateYAxis() {
-		return new ExplicitFunctionGraph(IndependentVariable::Y, Axis());
+	Graph* CreateXAxis() {
+		return new ExplicitFunctionGraph(XAxis());
+	}
+	Graph* CreateYAxis() {
+		return new ExplicitFunctionGraph(YAxis());
 	}
 }
 
