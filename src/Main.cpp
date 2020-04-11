@@ -119,7 +119,7 @@ void MouseMove(HWND handle, LPARAM lParam) {
 			center.X - (g_MousePos.x - x) * g_Graphs.GetScale(),
 			center.Y + (g_MousePos.y - y) * g_Graphs.GetScale()
 		});
-		InvalidateRect(handle, nullptr, true);
+		InvalidateRect(handle, nullptr, false);
 	}
 	g_MousePos.x = x;
 	g_MousePos.y = y;
@@ -142,5 +142,5 @@ void MouseWheel(HWND handle, WPARAM	wParam) {
 		});
 	}
 
-	InvalidateRect(handle, nullptr, true);
+	InvalidateRect(handle, nullptr, false);
 }
