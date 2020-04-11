@@ -10,13 +10,22 @@
 #include <cmath>
 #include <Windows.h>
 
+// Variables
 ShitGraph::Graphs g_Graphs;
 
 POINT g_MousePos;
 bool g_IsMoving = false;
 
+// Function declarations
 LRESULT CALLBACK WndProc(HWND handle, UINT message, WPARAM wParam, LPARAM lParam);
 
+void Paint(HWND handle);
+void LButtonDown(LPARAM lParam);
+void LButtonUp();
+void MouseMove(HWND handle, LPARAM lParam);
+void MouseWheel(HWND handle, WPARAM	wParam);
+
+// Function definitions
 int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 	using namespace ShitGraph;
 
@@ -28,10 +37,11 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 	g_Graphs.AddGraph(CreateXAxis());
 	g_Graphs.AddGraph(CreateYAxis());
 
-	g_Graphs.AddGraph(MakeForY(CreatePolynomial({ -6, 11, -6, 1 })));
+	g_Graphs.AddGraph(CreatePolynomial({ -6, 11, -6, 1 }));
 	g_Graphs.AddGraph(CreateEllipse(0, 0, 1, 1));
 	g_Graphs.AddGraph(CreateCFunction(std::sin));
 	g_Graphs.AddGraph(CreateCFunction(std::cos));
+
 	/*g_Graphs.AddGraph(CreateCFunction(std::tan, [](const Point& from, const Point& to) {
 		const Scalar aInt = from.X - std::fmod(from.X, M_PI / 2);
 		const Scalar bInt = to.X - std::fmod(to.X, M_PI / 2);
@@ -46,71 +56,68 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 
 LRESULT CALLBACK WndProc(HWND handle, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
-	case WM_PAINT: {
-		PAINTSTRUCT ps;
-		const HDC dc = BeginPaint(handle, &ps);
-
-		RECT clientRectApi;
-		GetClientRect(handle, &clientRectApi);
-		const ShitGraph::Rectangle clientRect = {
-			{ static_cast<ShitGraph::Scalar>(clientRectApi.left), static_cast<ShitGraph::Scalar>(clientRectApi.top) },
-			{ static_cast<ShitGraph::Scalar>(clientRectApi.right), static_cast<ShitGraph::Scalar>(clientRectApi.bottom) }
-		};
-
-		const HDC bufferDC = CreateCompatibleDC(dc);
-		const HBITMAP bitmap = CreateCompatibleBitmap(dc, clientRectApi.right, clientRectApi.bottom);
-		const HGDIOBJ oldBitmap = SelectObject(bufferDC, bitmap);
-
-		ShitGraph::Win32GraphicDevice device(handle, bufferDC, clientRect);
-		g_Graphs.Render(device);
-
-		BitBlt(dc, 0, 0, clientRectApi.right, clientRectApi.bottom, bufferDC, 0, 0, SRCCOPY);
-		SelectObject(bufferDC, oldBitmap);
-		DeleteObject(bitmap);
-		DeleteDC(bufferDC);
-
-		EndPaint(handle, &ps);
-		return 0;
-	}
-
-	case WM_LBUTTONDOWN:
-		g_MousePos.x = LOWORD(lParam);
-		g_MousePos.y = HIWORD(lParam);
-		g_IsMoving = true;
-		return 0;
-
-	case WM_MOUSEMOVE:
-		if (g_IsMoving) {
-			const ShitGraph::Point center = g_Graphs.GetCenter();
-			const WORD x = LOWORD(lParam), y = HIWORD(lParam);
-
-			g_Graphs.SetCenter({
-				center.X - (g_MousePos.x - x) * g_Graphs.GetScale(),
-				center.Y + (g_MousePos.y - y) * g_Graphs.GetScale()
-			});
-			g_MousePos.x = x;
-			g_MousePos.y = y;
-
-			InvalidateRect(handle, nullptr, true);
-		}
-		return 0;
-
-	case WM_LBUTTONUP:
-		g_IsMoving = false;
-		return 0;
-
-	case WM_MOUSEWHEEL:
-		if (static_cast<SHORT>(HIWORD(wParam)) > 0) {
-			g_Graphs.SetScale(g_Graphs.GetScale() / 2);
-		} else {
-			g_Graphs.SetScale(g_Graphs.GetScale() * 2);
-		}
-		InvalidateRect(handle, nullptr, true);
-		return 0;
-
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
+	case WM_PAINT: return Paint(handle), 0;
+	case WM_LBUTTONDOWN: return LButtonDown(lParam), 0;
+	case WM_LBUTTONUP: return LButtonUp(), 0;
+	case WM_MOUSEMOVE: return MouseMove(handle, lParam), 0;
+	case WM_MOUSEWHEEL: return MouseWheel(handle, wParam), 0;
+	case WM_DESTROY: return PostQuitMessage(0), 0;
 	}
 	return DefWindowProc(handle, message, wParam, lParam);
+}
+
+void Paint(HWND handle) {
+	PAINTSTRUCT ps;
+	const HDC dc = BeginPaint(handle, &ps);
+
+	RECT clientRectApi;
+	GetClientRect(handle, &clientRectApi);
+	const ShitGraph::Rectangle clientRect = {
+		{ static_cast<ShitGraph::Scalar>(clientRectApi.left), static_cast<ShitGraph::Scalar>(clientRectApi.top) },
+		{ static_cast<ShitGraph::Scalar>(clientRectApi.right), static_cast<ShitGraph::Scalar>(clientRectApi.bottom) }
+	};
+
+	const HDC bufferDC = CreateCompatibleDC(dc);
+	const HBITMAP bitmap = CreateCompatibleBitmap(dc, clientRectApi.right, clientRectApi.bottom);
+	const HGDIOBJ oldBitmap = SelectObject(bufferDC, bitmap);
+
+	ShitGraph::Win32GraphicDevice device(handle, bufferDC, clientRect);
+	g_Graphs.Render(device);
+
+	BitBlt(dc, 0, 0, clientRectApi.right, clientRectApi.bottom, bufferDC, 0, 0, SRCCOPY);
+	SelectObject(bufferDC, oldBitmap);
+	DeleteObject(bitmap);
+	DeleteDC(bufferDC);
+
+	EndPaint(handle, &ps);
+}
+void LButtonDown(LPARAM lParam) {
+	g_MousePos.x = LOWORD(lParam);
+	g_MousePos.y = HIWORD(lParam);
+	g_IsMoving = true;
+}
+void LButtonUp() {
+	g_IsMoving = false;
+}
+void MouseMove(HWND handle, LPARAM lParam) {
+	const WORD x = LOWORD(lParam), y = HIWORD(lParam);
+	if (g_IsMoving) {
+		const ShitGraph::Point center = g_Graphs.GetCenter();
+
+		g_Graphs.SetCenter({
+			center.X - (g_MousePos.x - x) * g_Graphs.GetScale(),
+			center.Y + (g_MousePos.y - y) * g_Graphs.GetScale()
+			});
+		InvalidateRect(handle, nullptr, true);
+	}
+	g_MousePos.x = x;
+	g_MousePos.y = y;
+}
+void MouseWheel(HWND handle, WPARAM	wParam) {
+	if (static_cast<SHORT>(HIWORD(wParam)) > 0) {
+		g_Graphs.SetScale(g_Graphs.GetScale() / 2);
+	} else {
+		g_Graphs.SetScale(g_Graphs.GetScale() * 2);
+	}
+	InvalidateRect(handle, nullptr, true);
 }
