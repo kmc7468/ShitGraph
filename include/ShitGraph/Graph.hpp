@@ -62,11 +62,21 @@ namespace ShitGraph {
 		void RemoveGraph(Graph* graph);
 		void DeleteGraph(Graph* graph);
 
-		void Render(GraphicDevice& device);
+		void Render(GraphicDevice& device) const;
+
+	private:
+		std::vector<std::vector<Point>> GetPoints(const GraphicDevice& device, const Rectangle& rect, const Rectangle& rectP, const Graph* graph) const;
+		bool ShouldDraw(const Rectangle& rect, const Graph* graph, Scalar dep) const noexcept;
 
 	private:
 		Point Logical(const GraphicDevice& device, const Point& point) const noexcept;
 		Rectangle Logical(const GraphicDevice& device, const Rectangle& rectangle) const noexcept;
 		Point Physical(const GraphicDevice& device, const Point& point) const noexcept;
+
+		Scalar Independent(const Graph* graph, const Point& point) const noexcept;
+		Scalar Dependent(const Graph* graph, const Point& point) const noexcept;
+		Point XY(const Graph* graph, const Point& point) const noexcept;
+		Scalar LogicalIndependent(const GraphicDevice& device, const Graph* graph, Scalar independent) const noexcept;
+		Scalar PhysicalDependent(const GraphicDevice& device, const Graph* graph, Scalar dependent) const noexcept;
 	};
 }

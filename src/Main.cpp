@@ -26,6 +26,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 	renderer.CreateMainWindow(WndProc);
 
 	g_Graphs.AddGraph(CreatePolynomial({ 0 }));
+	g_Graphs.AddGraph(new ExplicitFunctionGraph(IndependentVariable::Y, Polynomial({ 0 })));
 
 	g_Graphs.AddGraph(CreatePolynomial({ -6, 11, -6, 1 }));
 	g_Graphs.AddGraph(CreateEllipse(0, 0, 1, 1));
