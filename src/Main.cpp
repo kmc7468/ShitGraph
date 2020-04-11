@@ -15,7 +15,7 @@ constexpr ShitGraph::Scalar INITIALLY_SCALE = 0.262144;
 constexpr ShitGraph::Scalar MAGNIFICATION = 1 / 0.75;
 
 // Variables
-ShitGraph::Graphs g_Graphs;
+ShitGraph::Graphs g_Graphs(INITIALLY_SCALE);
 
 POINT g_MousePos;
 bool g_IsMoving = false;
