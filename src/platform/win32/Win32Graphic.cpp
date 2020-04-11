@@ -1,8 +1,8 @@
 #include <ShitGraph/platform/win32/Graphic.hpp>
 
+#ifdef SHITGRAPH_WIN32
 #include <vector>
 
-#ifdef SHITGRAPH_WIN32
 namespace {
 	Gdiplus::Color GdiplusObject(const ShitGraph::Color& color) noexcept {
 		return Gdiplus::Color(color.R, color.G, color.B);

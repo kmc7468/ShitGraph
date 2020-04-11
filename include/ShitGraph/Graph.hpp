@@ -6,9 +6,20 @@
 #include <vector>
 
 namespace ShitGraph {
+	enum class IndependentVariable {
+		X,
+		Y,
+	};
+}
+
+namespace ShitGraph {
 	class Graph {
+	private:
+		IndependentVariable m_IndependentVariable = IndependentVariable::X;
+
 	public:
 		Graph() noexcept = default;
+		explicit Graph(IndependentVariable independentVariable) noexcept;
 		Graph(const Graph&) = delete;
 		virtual ~Graph() = default;
 
@@ -16,11 +27,13 @@ namespace ShitGraph {
 		Graph& operator=(const Graph&) = delete;
 
 	public:
-		Vector Solve(Scalar x) const;
-		virtual bool IsContinuous(Point from, Point to) const = 0;
+		Vector Solve(Scalar independent) const;
+		bool IsContinuous(Point from, Point to) const;
+		IndependentVariable GetIndependentVariable() const noexcept;
 
 	protected:
 		virtual void Solve(Scalar x, Vector& y) const = 0;
+		virtual bool CheckContinuity(const Point& from, const Point& to) const = 0;
 	};
 }
 

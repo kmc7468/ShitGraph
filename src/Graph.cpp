@@ -6,10 +6,23 @@
 #include <utility>
 
 namespace ShitGraph {
-	Vector Graph::Solve(Scalar x) const {
-		Vector y;
-		Solve(x, y);
-		return y;
+	Graph::Graph(IndependentVariable independentVariable) noexcept
+		: m_IndependentVariable(independentVariable) {}
+
+	Vector Graph::Solve(Scalar independent) const {
+		Vector dependent;
+		Solve(independent, dependent);
+		return dependent;
+	}
+	bool Graph::IsContinuous(Point from, Point to) const {
+		if (m_IndependentVariable == IndependentVariable::Y) {
+			std::swap(from.X, from.Y);
+			std::swap(to.X, to.Y);
+		}
+		return CheckContinuity(from, to);
+	}
+	IndependentVariable Graph::GetIndependentVariable() const noexcept {
+		return m_IndependentVariable;
 	}
 }
 
@@ -41,6 +54,8 @@ namespace ShitGraph {
 	}
 
 	void Graphs::Render(GraphicDevice& device) {
+		// TODO
+
 		const ManagedGraphicObject<Pen> graphPen(device, device.Pen({ 0, 0, 0 }, 2));
 
 		const Rectangle rectP = device.GetRectangle();
