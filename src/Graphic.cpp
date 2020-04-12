@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <utility>
 
 namespace ShitGraph {
 	SolidBrush::SolidBrush(const Color& color) noexcept
@@ -23,6 +24,18 @@ namespace ShitGraph {
 	}
 	Scalar Pen::GetWidth() const noexcept {
 		return m_Width;
+	}
+}
+
+namespace ShitGraph {
+	Font::Font(std::string name, Scalar size) noexcept
+		: m_Name(std::move(name)), m_Size(size) {}
+
+	std::string_view Font::GetName() const noexcept {
+		return m_Name;
+	}
+	Scalar Font::GetSize() const noexcept {
+		return m_Size;
 	}
 }
 
@@ -55,6 +68,10 @@ namespace ShitGraph {
 	}
 	ShitGraph::Pen* GraphicDevice::Pen(const Color& color, Scalar width) {
 		const auto result = CreatePen(color, width);
+		return m_Objects.push_back(result), result;
+	}
+	ShitGraph::Font* GraphicDevice::Font(std::string name, Scalar size) {
+		const auto result = CreateFont(std::move(name), size);
 		return m_Objects.push_back(result), result;
 	}
 	void GraphicDevice::Delete(GraphicObject* object) {

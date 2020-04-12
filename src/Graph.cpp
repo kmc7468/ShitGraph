@@ -9,6 +9,8 @@ namespace ShitGraph {
 		: GraphClass(graphClass) {}
 
 	Vector Graph::Solve(Scalar independent) const {
+		if (!Visible) return {};
+
 		Vector dependent;
 		Solve(independent, dependent);
 		return dependent;
@@ -34,6 +36,12 @@ namespace ShitGraph {
 	Graph* Graph::ChangeWidth(Scalar newWidth) noexcept {
 		return ShitGraph::ChangeWidth(*this, newWidth), this;
 	}
+	bool Graph::MakeVisible() noexcept {
+		return ShitGraph::MakeVisible(*this), this;
+	}
+	bool Graph::MakeInvisible() noexcept {
+		return ShitGraph::MakeInvisible(*this), this;
+	}
 }
 
 namespace ShitGraph {
@@ -52,6 +60,15 @@ namespace ShitGraph {
 		m_Scale = newScale;
 	}
 
+	const Graph* Graphs::GetGraph(std::size_t index) const noexcept {
+		return m_Graphs[index];
+	}
+	Graph* Graphs::GetGraph(std::size_t index) noexcept {
+		return m_Graphs[index];
+	}
+	std::size_t Graphs::GetGraphCount() const noexcept {
+		return m_Graphs.size();
+	}
 	void Graphs::AddGraph(Graph* graph) {
 		m_Graphs.push_back(graph);
 	}

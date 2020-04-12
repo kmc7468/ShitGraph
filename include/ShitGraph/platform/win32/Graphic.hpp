@@ -42,7 +42,26 @@ namespace ShitGraph {
 	public:
 		virtual void* GetHandle() const noexcept override;
 	};
+
+	class Win32Font final : public Font {
+	private:
+		Gdiplus::Font* m_Handle = nullptr;
+
+	public:
+		Win32Font(std::string name, Scalar size);
+		Win32Font(const Win32Font&) = delete;
+		virtual ~Win32Font() override;
+
+	public:
+		Win32Font& operator=(const Win32Font&) = delete;
+
+	public:
+		virtual void* GetHandle() const noexcept override;
+	};
 }
+
+#pragma push_macro("CreateFont")
+#undef CreateFont
 
 namespace ShitGraph {
 	class Win32GraphicDevice final : public GraphicDevice {
@@ -60,10 +79,15 @@ namespace ShitGraph {
 
 	public:
 		virtual void DrawLines(const ShitGraph::Pen* pen, const Point* points, std::size_t size) override;
+		virtual void DrawString(const ShitGraph::Font* font, const ShitGraph::Brush* brush, const Point& location, const std::string& string) override;
 
 	protected:
 		virtual ShitGraph::SolidBrush* CreateSolidBrush(const Color& color) override;
 		virtual ShitGraph::Pen* CreatePen(const Color& color, Scalar width) override;
+		virtual ShitGraph::Font* CreateFont(std::string name, Scalar size) override;
 	};
 }
+
+#define CreateFont
+#pragma pop_macro("CreateFont")
 #endif

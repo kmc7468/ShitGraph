@@ -3,6 +3,8 @@
 #include <ShitGraph/CoreType.hpp>
 
 #include <cstddef>
+#include <string>
+#include <string_view>
 #include <vector>
 
 namespace ShitGraph {
@@ -65,6 +67,25 @@ namespace ShitGraph {
 		Color GetColor() const noexcept;
 		Scalar GetWidth() const noexcept;
 	};
+
+	class Font : public GraphicObject {
+	private:
+		std::string m_Name;
+		Scalar m_Size = 9;
+
+	public:
+		Font() noexcept = default;
+		Font(std::string name, Scalar size) noexcept;
+		Font(const Font&) = delete;
+		virtual ~Font() override = default;
+
+	public:
+		Font& operator=(const Font&) = delete;
+
+	public:
+		std::string_view GetName() const noexcept;
+		Scalar GetSize() const noexcept;
+	};
 }
 
 namespace ShitGraph {
@@ -89,13 +110,16 @@ namespace ShitGraph {
 		ShitGraph::SolidBrush* SolidBrush(const Color& color);
 		ShitGraph::Pen* Pen(const Color& color);
 		ShitGraph::Pen* Pen(const Color& color, Scalar width);
+		ShitGraph::Font* Font(std::string name, Scalar size);
 		void Delete(GraphicObject* object);
 
 		virtual void DrawLines(const ShitGraph::Pen* pen, const Point* points, std::size_t size) = 0;
+		virtual void DrawString(const ShitGraph::Font* font, const ShitGraph::Brush* brush, const Point& location, const std::string& string) = 0;
 
 	protected:
 		virtual ShitGraph::SolidBrush* CreateSolidBrush(const Color& color) = 0;
 		virtual ShitGraph::Pen* CreatePen(const Color& color, Scalar width) = 0;
+		virtual ShitGraph::Font* CreateFont(std::string name, Scalar size) = 0;
 	};
 
 	template<typename T>

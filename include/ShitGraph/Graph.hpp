@@ -20,6 +20,7 @@ namespace ShitGraph {
 
 		ShitGraph::Color Color;
 		Scalar Width = 2;
+		bool Visible = true;
 	};
 
 	template<typename T>
@@ -37,6 +38,14 @@ namespace ShitGraph {
 	template<typename T>
 	std::enable_if_t<std::is_base_of_v<GraphClass, std::decay_t<T>>, T&&> ChangeWidth(T&& graphClass, Scalar width) noexcept {
 		return graphClass.Width = width, std::forward<T>(graphClass);
+	}
+	template<typename T>
+	std::enable_if_t<std::is_base_of_v<GraphClass, std::decay_t<T>>, T&&> MakeVisible(T&& graphClass) noexcept {
+		return graphClass.Visible = true, std::forward<T>(graphClass);
+	}
+	template<typename T>
+	std::enable_if_t<std::is_base_of_v<GraphClass, std::decay_t<T>>, T&&> MakeInvisible(T&& graphClass) noexcept {
+		return graphClass.Visible = false, std::forward<T>(graphClass);
 	}
 
 	class Graph : public GraphClass {
@@ -57,6 +66,8 @@ namespace ShitGraph {
 
 		Graph* ChangeColor(ShitGraph::Color newColor) noexcept;
 		Graph* ChangeWidth(Scalar newWidth) noexcept;
+		bool MakeVisible() noexcept;
+		bool MakeInvisible() noexcept;
 
 	protected:
 		virtual void Solve(Scalar x, Vector& y) const = 0;
@@ -85,6 +96,9 @@ namespace ShitGraph {
 		Scalar GetScale() const noexcept;
 		void SetScale(Scalar newScale) noexcept;
 
+		const Graph* GetGraph(std::size_t index) const noexcept;
+		Graph* GetGraph(std::size_t index) noexcept;
+		std::size_t GetGraphCount() const noexcept;
 		void AddGraph(Graph* graph);
 		void RemoveGraph(Graph* graph);
 		void DeleteGraph(Graph* graph);
