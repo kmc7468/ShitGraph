@@ -196,8 +196,8 @@ void MouseWheel(HWND handle, WPARAM	wParam) {
 			{ static_cast<ShitGraph::Scalar>(g_MousePos.x), static_cast<ShitGraph::Scalar>(g_MousePos.y) });
 		const ShitGraph::Point center = g_Graphs.GetCenter();
 		g_Graphs.SetCenter({
-			center.X + (newMouse.X - mouse.X) / delta,
-			center.Y + (newMouse.Y - mouse.Y) / delta,
+			center.X + (newMouse.X - mouse.X),
+			center.Y + (newMouse.Y - mouse.Y),
 		});
 	}
 
