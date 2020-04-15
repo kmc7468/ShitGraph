@@ -61,6 +61,9 @@ namespace ShitGraph {
 		Vector Solve(Scalar independent) const;
 		bool IsContinuous(Point from, Point to) const;
 
+		Scalar Independent(const Point& point) const noexcept;
+		Scalar Dependent(const Point& point) const noexcept;
+
 		Graph* MakeForY() noexcept;
 		Graph* MakeForX() noexcept;
 

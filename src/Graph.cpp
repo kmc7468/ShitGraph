@@ -23,6 +23,13 @@ namespace ShitGraph {
 		return CheckContinuity(from, to);
 	}
 
+	Scalar Graph::Independent(const Point& point) const noexcept {
+		return IndependentVariable == IndependentVariable::X ? point.X : point.Y;
+	}
+	Scalar Graph::Dependent(const Point& point) const noexcept {
+		return IndependentVariable == IndependentVariable::Y ? point.X : point.Y;
+	}
+
 	Graph* Graph::MakeForY() noexcept {
 		return ShitGraph::MakeForY(*this), this;
 	}
