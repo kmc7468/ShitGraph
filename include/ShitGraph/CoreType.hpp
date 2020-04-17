@@ -11,13 +11,11 @@ namespace ShitGraph {
 		Scalar X = 0, Y = 0;
 	};
 
-	struct Line final {
-		Point From, To;
-	};
-
 	struct Rectangle final {
 		Point LeftTop, RightBottom;
 	};
+
+	using Line = std::vector<Point>;
 }
 
 namespace ShitGraph {
