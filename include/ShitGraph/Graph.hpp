@@ -56,7 +56,7 @@ namespace ShitGraph {
 	public:
 		Graph(const Sampler* sampler, const GraphClass& graphClass) noexcept;
 		Graph(const Graph&) = delete;
-		virtual ~Graph() = default;
+		virtual ~Graph();
 
 	public:
 		Graph& operator=(const Graph&) = delete;

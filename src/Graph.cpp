@@ -6,6 +6,9 @@
 namespace ShitGraph {
 	Graph::Graph(const Sampler* sampler, const GraphClass& graphClass) noexcept
 		: GraphClass(graphClass), m_Sampler(sampler) {}
+	Graph::~Graph() {
+		delete m_Sampler;
+	}
 
 	std::vector<Line> Graph::Sample(const SamplingContext& context) const {
 		if (!Visible) return {};
