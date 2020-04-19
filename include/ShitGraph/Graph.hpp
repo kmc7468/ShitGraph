@@ -2,6 +2,7 @@
 
 #include <ShitGraph/CoreType.hpp>
 #include <ShitGraph/Graphic.hpp>
+#include <ShitGraph/Sampler.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -49,8 +50,11 @@ namespace ShitGraph {
 	}
 
 	class Graph : public GraphClass {
+	private:
+		const Sampler* m_Sampler = nullptr;
+
 	public:
-		explicit Graph(const GraphClass& graphClass) noexcept;
+		Graph(const Sampler* sampler, const GraphClass& graphClass) noexcept;
 		Graph(const Graph&) = delete;
 		virtual ~Graph() = default;
 
@@ -58,11 +62,11 @@ namespace ShitGraph {
 		Graph& operator=(const Graph&) = delete;
 
 	public:
-		Vector Solve(Scalar independent) const;
-		bool IsContinuous(Point from, Point to) const;
+		std::vector<Line> Sample(const SamplingContext& context) const;
 
 		Scalar Independent(const Point& point) const noexcept;
 		Scalar Dependent(const Point& point) const noexcept;
+		Point XY(Scalar independent, Scalar dependent) const noexcept;
 
 		Graph* MakeForY() noexcept;
 		Graph* MakeForX() noexcept;
@@ -71,10 +75,6 @@ namespace ShitGraph {
 		Graph* ChangeWidth(Scalar newWidth) noexcept;
 		bool MakeVisible() noexcept;
 		bool MakeInvisible() noexcept;
-
-	protected:
-		virtual void Solve(Scalar x, Vector& y) const = 0;
-		virtual bool CheckContinuity(const Point& from, const Point& to) const = 0;
 	};
 }
 
@@ -108,23 +108,11 @@ namespace ShitGraph {
 
 		void Render(GraphicDevice& device) const;
 
-	private:
-		std::vector<std::vector<Point>> GetPoints(const GraphicDevice& device, const Rectangle& rect, const Rectangle& rectP, const Graph* graph) const;
-		bool ShouldDraw(const Rectangle& rect, const Graph* graph, Scalar dep) const noexcept;
-
 	public:
 		Point Logical(int width, int height, const Point& point) const noexcept;
 		Point Physical(int width, int height, const Point& point) const noexcept;
 
 	private:
-		Point Logical(const GraphicDevice& device, const Point& point) const noexcept;
 		Rectangle Logical(const GraphicDevice& device, const Rectangle& rectangle) const noexcept;
-		Point Physical(const GraphicDevice& device, const Point& point) const noexcept;
-
-		Scalar Independent(const Graph* graph, const Point& point) const noexcept;
-		Scalar Dependent(const Graph* graph, const Point& point) const noexcept;
-		Point XY(const Graph* graph, const Point& point) const noexcept;
-		Scalar LogicalIndependent(const GraphicDevice& device, const Graph* graph, Scalar independent) const noexcept;
-		Scalar PhysicalDependent(const GraphicDevice& device, const Graph* graph, Scalar dependent) const noexcept;
 	};
 }

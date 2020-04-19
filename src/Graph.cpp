@@ -2,25 +2,14 @@
 
 #include <algorithm>
 #include <cassert>
-#include <memory>
 
 namespace ShitGraph {
-	Graph::Graph(const GraphClass& graphClass) noexcept
-		: GraphClass(graphClass) {}
+	Graph::Graph(const Sampler* sampler, const GraphClass& graphClass) noexcept
+		: GraphClass(graphClass), m_Sampler(sampler) {}
 
-	Vector Graph::Solve(Scalar independent) const {
+	std::vector<Line> Graph::Sample(const SamplingContext& context) const {
 		if (!Visible) return {};
-
-		Vector dependent;
-		Solve(independent, dependent);
-		return dependent;
-	}
-	bool Graph::IsContinuous(Point from, Point to) const {
-		if (IndependentVariable == ShitGraph::IndependentVariable::Y) {
-			std::swap(from.X, from.Y);
-			std::swap(to.X, to.Y);
-		}
-		return CheckContinuity(from, to);
+		else return m_Sampler->Sample(context, this);
 	}
 
 	Scalar Graph::Independent(const Point& point) const noexcept {
@@ -28,6 +17,10 @@ namespace ShitGraph {
 	}
 	Scalar Graph::Dependent(const Point& point) const noexcept {
 		return IndependentVariable == IndependentVariable::Y ? point.X : point.Y;
+	}
+	Point Graph::XY(Scalar independent, Scalar dependent) const noexcept {
+		if (IndependentVariable == ShitGraph::IndependentVariable::X) return { independent, dependent };
+		else return { dependent, independent };
 	}
 
 	Graph* Graph::MakeForY() noexcept {
@@ -92,71 +85,20 @@ namespace ShitGraph {
 	void Graphs::Render(GraphicDevice& device) const {
 		const Rectangle rectP = device.GetRectangle();
 		const Rectangle rect = Logical(device, rectP);
+		const SamplingContext samplingContext{ rect, rectP, m_Center, m_Scale };
 
 		for (const Graph* const graph : m_Graphs) {
 			const ManagedGraphicObject<Pen> graphPen(device, device.Pen(graph->Color, graph->Width));
-			const std::vector<std::vector<Point>> points = GetPoints(device, rect, rectP, graph);
-
-			for (const auto& area : points) {
-				for (std::size_t begin = 0, i = 0; i < area.size(); ++i) {
-					if (i == area.size() - 1) {
-						device.DrawLines(graphPen, area.data() + begin, i - begin + 1);
-						break;
-					} else if (i != 0) {
-						const Point from = Logical(device, area[i - 1]);
-						const Point to = Logical(device, area[i]);
-						if (!graph->IsContinuous(from, to)) {
-							device.DrawLines(graphPen, area.data() + begin, i - begin);
-							begin = i;
-						}
-					}
+			const std::vector<Line> lines = graph->Sample(samplingContext);
+			for (const Line& line : lines) {
+				if (line.empty()) continue;
+				else if (line.size() == 1) {
+					// TODO: draw point
+				} else {
+					device.DrawLines(graphPen, line.data(), line.size());
 				}
 			}
 		}
-	}
-
-	std::vector<std::vector<Point>> Graphs::GetPoints(const GraphicDevice& device, const Rectangle& rect, const Rectangle& rectP, const Graph* graph) const {
-		std::vector<std::vector<Point>> points;
-		const int pointCount = static_cast<int>(Independent(graph, rectP.RightBottom));
-
-		Vector prevDeps;
-		bool prevDrawed = false;
-
-		for (int indepP = 0; indepP < pointCount; ++indepP) {
-			const Scalar indep = LogicalIndependent(device, graph, indepP);
-			Vector deps = graph->Solve(indep);
-			if (points.empty() && !deps.empty()) {
-				points.resize(deps.size());
-			}
-
-			bool drawed = false;
-			for (std::size_t i = 0; i < deps.size(); ++i) {
-				const Scalar dep = deps[i];
-				const bool shouldDraw = ShouldDraw(rect, graph, dep);
-				if (shouldDraw || prevDrawed) {
-					const Scalar depP = PhysicalDependent(device, graph, dep);
-					points[i].push_back(XY(graph, { static_cast<Scalar>(indepP), depP }));
-				}
-				drawed |= shouldDraw;
-			}
-
-			if (!prevDrawed && drawed && indepP != 0) {
-				for (std::size_t i = 0; i < prevDeps.size(); ++i) {
-					const Scalar prevDep = prevDeps[i];
-					const Scalar prevDepP = PhysicalDependent(device, graph, prevDep);
-					points[i].insert(points[i].end() - (points[i].empty() ? 0 : 1), XY(graph, { static_cast<Scalar>(indepP - 1), prevDepP }));
-				}
-			}
-
-			prevDeps = std::move(deps);
-			prevDrawed = drawed;
-		}
-
-		return points;
-	}
-	bool Graphs::ShouldDraw(const Rectangle& rect, const Graph* graph, Scalar dep) const noexcept {
-		if (graph->IndependentVariable == IndependentVariable::X) return rect.RightBottom.Y <= dep && dep <= rect.LeftTop.Y;
-		else return rect.LeftTop.X <= dep && dep <= rect.RightBottom.X;
 	}
 
 	Point Graphs::Logical(int width, int height, const Point& point) const noexcept {
@@ -172,34 +114,8 @@ namespace ShitGraph {
 		};
 	}
 
-	Point Graphs::Logical(const GraphicDevice& device, const Point& point) const noexcept {
-		return Logical(device.GetWidth(), device.GetHeight(), point);
-	}
 	Rectangle Graphs::Logical(const GraphicDevice& device, const Rectangle& rectangle) const noexcept {
-		return {
-			Logical(device, rectangle.LeftTop),
-			Logical(device, rectangle.RightBottom)
-		};
-	}
-	Point Graphs::Physical(const GraphicDevice& device, const Point& point) const noexcept {
-		return Physical(device.GetWidth(), device.GetHeight(), point);
-	}
-
-	Scalar Graphs::Independent(const Graph* graph, const Point& point) const noexcept {
-		return graph->IndependentVariable == IndependentVariable::X ? point.X : point.Y;
-	}
-	Scalar Graphs::Dependent(const Graph* graph, const Point& point) const noexcept {
-		return graph->IndependentVariable == IndependentVariable::Y ? point.X : point.Y;
-	}
-	Point Graphs::XY(const Graph* graph, const Point& point) const noexcept {
-		return graph->IndependentVariable == IndependentVariable::X ? point : Point{ point.Y, point.X };
-	}
-	Scalar Graphs::LogicalIndependent(const GraphicDevice& device, const Graph* graph, Scalar independent) const noexcept {
-		return Independent(graph, Logical(device,
-			graph->IndependentVariable == IndependentVariable::X ? Point{ independent, 0 } : Point{ 0, independent }));
-	}
-	Scalar Graphs::PhysicalDependent(const GraphicDevice& device, const Graph* graph, Scalar dependent) const noexcept {
-		return Dependent(graph, Physical(device,
-			graph->IndependentVariable == IndependentVariable::X ? Point{ 0, dependent } : Point{ dependent, 0 }));
+		return { Logical(device.GetWidth(), device.GetHeight(), rectangle.LeftTop),
+			Logical(device.GetWidth(), device.GetHeight(), rectangle.RightBottom) };
 	}
 }

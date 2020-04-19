@@ -32,7 +32,7 @@ namespace ShitGraph {
 
 namespace ShitGraph {
 	bool Sampler::ShouldDraw(const SamplingContext& context, const Graph* graph, Scalar dep) const noexcept {
-		if (graph->IndependentVariable == IndependentVariable::X) return context.ViewportPhysical.RightBottom.Y <= dep && dep <= context.ViewportPhysical.LeftTop.Y;
-		else return context.ViewportPhysical.LeftTop.X <= dep && dep <= context.ViewportPhysical.RightBottom.X;
+		if (graph->IndependentVariable == IndependentVariable::X) return context.Viewport.RightBottom.Y <= dep && dep <= context.Viewport.LeftTop.Y;
+		else return context.Viewport.LeftTop.X <= dep && dep <= context.Viewport.RightBottom.X;
 	}
 }
