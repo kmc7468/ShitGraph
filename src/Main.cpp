@@ -58,7 +58,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 	g_Graphs.AddGraph(CreateYAxis());
 
 	g_Graphs.AddGraph(CreatePolynomial({ -6, 11, -6, 1 })->ChangeColor(RandomColor()));
-	//g_Graphs.AddGraph(CreateEllipse(0, 0, 1, 1)->ChangeColor(RandomColor())); // 오류
+	g_Graphs.AddGraph(CreateEllipse(0, 0, 1, 1)->ChangeColor(RandomColor()));
 	g_Graphs.AddGraph(CreateCFunction(std::sin)->ChangeColor(RandomColor()));
 	g_Graphs.AddGraph(CreateCFunction(std::cos)->ChangeColor(RandomColor()));
 	g_Graphs.AddGraph(CreateCFunction(std::log2)->ChangeColor(RandomColor()));
@@ -83,7 +83,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 			y.push_back(-sqrt);
 		}
 	};
-	//g_Graphs.AddGraph(new MultivaluedExplicitFunctionGraph(fClass)); // 오류
+	g_Graphs.AddGraph(new MultivaluedExplicitFunctionGraph(fClass));
 
 	g_Graphs.AddGraph(CreateCFunction([](Scalar x) {
 		Scalar y = 0.0;

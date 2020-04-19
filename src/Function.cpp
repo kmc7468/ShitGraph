@@ -29,7 +29,6 @@ namespace ShitGraph {
 		// TODO: 연속성 확인
 
 		std::vector<Line> result;
-		Line* currentLine = nullptr;
 		const int sampleCount = static_cast<int>(graph->Independent(context.ViewportPhysical.RightBottom));
 
 		Vector prevDeps;
@@ -38,8 +37,8 @@ namespace ShitGraph {
 		for (int indepP = 0; indepP < sampleCount; ++indepP) {
 			const Scalar indep = context.LogicalIndependent(graph, indepP);
 			const Vector deps = Solve(graph, indep);
-			if (!currentLine && !deps.empty()) {
-				currentLine = &result.emplace_back();
+			if (result.empty() && !deps.empty()) {
+				result.resize(deps.size());
 			}
 
 			bool drawed = false;
@@ -48,7 +47,7 @@ namespace ShitGraph {
 				const bool shouldDraw = ShouldDraw(context, graph, dep);
 				if (shouldDraw || prevDrawed) {
 					const Scalar depP = context.PhysicalDependent(graph, dep);
-					currentLine->push_back(graph->XY(indepP, depP));
+					result[i].push_back(graph->XY(indepP, depP));
 				}
 				drawed |= shouldDraw;
 			}
@@ -57,7 +56,7 @@ namespace ShitGraph {
 				for (std::size_t i = 0; i < prevDeps.size(); ++i) {
 					const Scalar prevDep = prevDeps[i];
 					const Scalar prevDepP = context.PhysicalDependent(graph, prevDep);
-					currentLine->insert(currentLine->end() - (currentLine->empty() ? 0 : 1), graph->XY(indepP - 1, prevDepP));
+					result[i].insert(result[i].end() - (result[i].empty() ? 0 : 1), graph->XY(indepP - 1, prevDepP));
 				}
 			}
 
