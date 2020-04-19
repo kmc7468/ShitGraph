@@ -14,6 +14,13 @@ namespace ShitGraph {
 		if (!Visible) return {};
 		else return m_Sampler->Sample(context, this);
 	}
+	bool Graph::IsContinuous(Point from, Point to) const {
+		if (IndependentVariable == ShitGraph::IndependentVariable::Y) {
+			std::swap(from.X, from.Y);
+			std::swap(to.X, to.Y);
+		}
+		return CheckContinuity(from, to);
+	}
 
 	Scalar Graph::Independent(const Point& point) const noexcept {
 		return IndependentVariable == IndependentVariable::X ? point.X : point.Y;
@@ -96,12 +103,31 @@ namespace ShitGraph {
 
 			const std::vector<Line> lines = graph->Sample(samplingContext);
 			for (const Line& line : lines) {
-				if (line.empty()) continue;
-				else if (line.size() == 1) {
+				if (line.size() == 1) {
 					device.DrawPoint(graphBrush, line.front(), graph->Width);
-				} else {
+				} else if (line.size() > 1) {
 					device.DrawLines(graphPen, line.data(), line.size());
 				}
+
+				/*if (line.empty()) continue;
+				else if (line.size() == 1) {
+					device.DrawPoint(graphBrush, line.front(), graph->Width);
+					break;
+				}
+
+				for (std::size_t begin = 0, i = 0; i < line.size(); ++i) {
+					if (i == line.size() - 1) {
+						device.DrawLines(graphPen, line.data() + begin, i - begin + 1);
+						break;
+					} else if (i != 0) {
+						const Point from = samplingContext.Logical(line[i - 1]);
+						const Point to = samplingContext.Logical(line[i]);
+						if (!graph->IsContinuous(from, to)) {
+							device.DrawLines(graphPen, line.data() + begin, i - begin);
+							begin = i;
+						}
+					}
+				}*/
 			}
 		}
 	}

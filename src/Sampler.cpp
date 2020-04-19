@@ -2,6 +2,9 @@
 
 #include <ShitGraph/Graph.hpp>
 
+#include <algorithm>
+#include <iterator>
+
 namespace ShitGraph {
 	Point SamplingContext::Logical(const Point& point) const noexcept {
 		const Scalar& width = ViewportPhysical.RightBottom.X;
@@ -34,5 +37,30 @@ namespace ShitGraph {
 	bool Sampler::ShouldDraw(const SamplingContext& context, const Graph* graph, Scalar dep) const noexcept {
 		if (graph->IndependentVariable == IndependentVariable::X) return context.Viewport.RightBottom.Y <= dep && dep <= context.Viewport.LeftTop.Y;
 		else return context.Viewport.LeftTop.X <= dep && dep <= context.Viewport.RightBottom.X;
+	}
+	void Sampler::SeparateLines(const SamplingContext& context, const Graph* graph, std::vector<Line>& lines) const {
+		std::vector<Line> newLines;
+
+		for (std::size_t i = 0; i < lines.size(); ++i) {
+			Line& line = lines[i];
+			if (line.size() < 2) continue;
+
+			std::size_t begin = 0;
+			for (std::size_t j = 0; j < line.size(); ++j) {
+				if (j) {
+					const Point from = context.Logical(line[j - 1]);
+					const Point to = context.Logical(line[j]);
+					if (!graph->IsContinuous(from, to)) {
+						Line& newLine = newLines.emplace_back();
+						std::copy(line.begin() + begin, line.begin() + j, std::back_inserter(newLine));
+						begin = j;
+					}
+				}
+			}
+
+			line.erase(line.begin(), line.begin() + begin);
+		}
+
+		lines.insert(lines.end(), newLines.begin(), newLines.end());
 	}
 }

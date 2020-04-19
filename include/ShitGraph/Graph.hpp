@@ -63,6 +63,7 @@ namespace ShitGraph {
 
 	public:
 		std::vector<Line> Sample(const SamplingContext& context) const;
+		bool IsContinuous(Point from, Point to) const;
 
 		Scalar Independent(const Point& point) const noexcept;
 		Scalar Dependent(const Point& point) const noexcept;
@@ -75,6 +76,9 @@ namespace ShitGraph {
 		Graph* ChangeWidth(Scalar newWidth) noexcept;
 		bool MakeVisible() noexcept;
 		bool MakeInvisible() noexcept;
+
+	protected:
+		virtual bool CheckContinuity(const Point& from, const Point& to) const = 0;
 	};
 }
 

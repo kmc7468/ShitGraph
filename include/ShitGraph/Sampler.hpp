@@ -36,5 +36,6 @@ namespace ShitGraph {
 
 	protected:
 		bool ShouldDraw(const SamplingContext& context, const Graph* graph, Scalar dep) const noexcept;
+		void SeparateLines(const SamplingContext& context, const Graph* graph, std::vector<Line>& lines) const;
 	};
 }

@@ -47,10 +47,8 @@ namespace ShitGraph {
 	public:
 		FunctionGraph& operator=(const FunctionGraph&) = delete;
 
-	public:
-		bool CheckContinuity(const Point& from, const Point& to) const;
-
 	protected:
+		virtual bool CheckContinuity(const Point& from, const Point& to) const override;
 		const FunctionParameter* GetParameter() const noexcept;
 	};
 }

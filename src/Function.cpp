@@ -26,8 +26,6 @@ namespace ShitGraph {
 namespace ShitGraph {
 	template<typename T>
 	std::vector<Line> ExplicitFunctionSampler<T>::Sample(const SamplingContext& context, const Graph* graph) const {
-		// TODO: 연속성 확인
-
 		std::vector<Line> result;
 		const int sampleCount = static_cast<int>(graph->Independent(context.ViewportPhysical.RightBottom));
 
@@ -64,6 +62,7 @@ namespace ShitGraph {
 			prevDrawed = drawed;
 		}
 
+		SeparateLines(context, graph, result);
 		return result;
 	}
 
