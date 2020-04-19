@@ -91,3 +91,17 @@ namespace ShitGraph {
 		m_Function(GetParameter(), x, y);
 	}
 }
+
+namespace ShitGraph {
+	std::vector<Line> ImplicitFunctionSampler::Sample(const SamplingContext& context, const Graph* graph) const {
+		// TODO
+		return std::vector<Line>();
+	}
+
+	ImplicitFunctionGraph::ImplicitFunctionGraph(const ImplicitFunctionClass& graphClass) noexcept
+		: FunctionGraph(new ImplicitFunctionSampler, graphClass), m_Function(graphClass.Function) {}
+
+	bool ImplicitFunctionGraph::CheckTrue(const Point& point) const {
+		return m_Function(point);
+	}
+}

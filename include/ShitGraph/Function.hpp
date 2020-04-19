@@ -90,6 +90,8 @@ namespace ShitGraph {
 
 	public:
 		ExplicitFunctionGraph& operator=(const ExplicitFunctionGraph&) = delete;
+
+	public:
 		void Solve(Scalar x, Vector& y) const;
 	};
 
@@ -110,6 +112,45 @@ namespace ShitGraph {
 
 	public:
 		MultivaluedExplicitFunctionGraph& operator=(const MultivaluedExplicitFunctionGraph&) = delete;
+
+	public:
 		void Solve(Scalar x, Vector& y) const;
+	};
+}
+
+namespace ShitGraph {
+	class ImplicitFunctionSampler final : public Sampler {
+	public:
+		ImplicitFunctionSampler() noexcept = default;
+		ImplicitFunctionSampler(const ImplicitFunctionSampler&) = delete;
+		virtual ~ImplicitFunctionSampler() override = default;
+
+	public:
+		ImplicitFunctionSampler& operator=(const ImplicitFunctionSampler&) = delete;
+
+	public:
+		virtual std::vector<Line> Sample(const SamplingContext& context, const Graph* graph) const override;
+	};
+
+	using ImplicitFunction = bool(*)(const Point& point);
+
+	struct ImplicitFunctionClass : FunctionGraphClass {
+		ImplicitFunction Function = nullptr;
+	};
+
+	class ImplicitFunctionGraph final : public FunctionGraph {
+	private:
+		ImplicitFunction m_Function = nullptr;
+
+	public:
+		explicit ImplicitFunctionGraph(const ImplicitFunctionClass& graphClass) noexcept;
+		ImplicitFunctionGraph(const ImplicitFunctionGraph&) = delete;
+		virtual ~ImplicitFunctionGraph() override = default;
+
+	public:
+		ImplicitFunctionGraph& operator=(const ImplicitFunctionGraph&) = delete;
+
+	public:
+		bool CheckTrue(const Point& point) const;
 	};
 }
