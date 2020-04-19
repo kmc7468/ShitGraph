@@ -89,11 +89,13 @@ namespace ShitGraph {
 
 		for (const Graph* const graph : m_Graphs) {
 			const ManagedGraphicObject<Pen> graphPen(device, device.Pen(graph->Color, graph->Width));
+			const ManagedGraphicObject<Brush> graphBrush(device, device.SolidBrush(graph->Color));
+
 			const std::vector<Line> lines = graph->Sample(samplingContext);
 			for (const Line& line : lines) {
 				if (line.empty()) continue;
 				else if (line.size() == 1) {
-					// TODO: draw point
+					device.DrawPoint(graphBrush, line.front(), graph->Width);
 				} else {
 					device.DrawLines(graphPen, line.data(), line.size());
 				}

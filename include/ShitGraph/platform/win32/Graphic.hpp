@@ -79,6 +79,7 @@ namespace ShitGraph {
 
 	public:
 		virtual void DrawLines(const ShitGraph::Pen* pen, const Point* points, std::size_t size) override;
+		virtual void DrawPoint(const ShitGraph::Brush* brush, const Point& point, Scalar radius) override;
 		virtual void DrawString(const ShitGraph::Font* font, const ShitGraph::Brush* brush, const Point& location, const std::string& string) override;
 
 	protected:

@@ -71,6 +71,11 @@ namespace ShitGraph {
 
 		m_Graphics.DrawLines(static_cast<Gdiplus::Pen*>(pen->GetHandle()), pointsGdi.data(), static_cast<INT>(size));
 	}
+	void Win32GraphicDevice::DrawPoint(const ShitGraph::Brush* brush, const Point& point, Scalar radius) {
+		const Gdiplus::REAL width = static_cast<Gdiplus::REAL>(radius * 2);
+		m_Graphics.FillEllipse(static_cast<Gdiplus::Brush*>(brush->GetHandle()),
+			static_cast<Gdiplus::REAL>(point.X - radius), static_cast<Gdiplus::REAL>(point.Y - radius), width, width);
+	}
 	void Win32GraphicDevice::DrawString(const ShitGraph::Font* font, const ShitGraph::Brush* brush, const Point& location, const std::string& string) {
 		const std::wstring stringWide = WideChar(string);
 		m_Graphics.DrawString(stringWide.c_str(), static_cast<INT>(stringWide.size()), static_cast<Gdiplus::Font*>(font->GetHandle()),
