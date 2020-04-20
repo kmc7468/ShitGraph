@@ -1,5 +1,6 @@
 #include <ShitGraph/CoreType.hpp>
 
+#include <cstdint>
 #include <random>
 
 namespace ShitGraph {

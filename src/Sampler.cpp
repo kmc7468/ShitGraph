@@ -46,21 +46,17 @@ namespace ShitGraph {
 			if (line.size() < 2) continue;
 
 			std::size_t begin = 0;
-			for (std::size_t j = 0; j < line.size(); ++j) {
-				if (j) {
-					const Point from = context.Logical(line[j - 1]);
-					const Point to = context.Logical(line[j]);
-					if (!graph->IsContinuous(from, to)) {
-						Line& newLine = newLines.emplace_back();
-						std::copy(line.begin() + begin, line.begin() + j, std::back_inserter(newLine));
-						begin = j;
-					}
+			for (std::size_t j = 1; j < line.size(); ++j) {
+				const Point from = context.Logical(line[j - 1]);
+				const Point to = context.Logical(line[j]);
+				if (!graph->IsContinuous(from, to)) {
+					Line& newLine = newLines.emplace_back();
+					std::copy(line.begin() + begin, line.begin() + j, std::back_inserter(newLine));
+					begin = j;
 				}
 			}
-
 			line.erase(line.begin(), line.begin() + begin);
 		}
-
 		lines.insert(lines.end(), newLines.begin(), newLines.end());
 	}
 }

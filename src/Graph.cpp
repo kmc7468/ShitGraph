@@ -108,26 +108,6 @@ namespace ShitGraph {
 				} else if (line.size() > 1) {
 					device.DrawLines(graphPen, line.data(), line.size());
 				}
-
-				/*if (line.empty()) continue;
-				else if (line.size() == 1) {
-					device.DrawPoint(graphBrush, line.front(), graph->Width);
-					break;
-				}
-
-				for (std::size_t begin = 0, i = 0; i < line.size(); ++i) {
-					if (i == line.size() - 1) {
-						device.DrawLines(graphPen, line.data() + begin, i - begin + 1);
-						break;
-					} else if (i != 0) {
-						const Point from = samplingContext.Logical(line[i - 1]);
-						const Point to = samplingContext.Logical(line[i]);
-						if (!graph->IsContinuous(from, to)) {
-							device.DrawLines(graphPen, line.data() + begin, i - begin);
-							begin = i;
-						}
-					}
-				}*/
 			}
 		}
 	}
