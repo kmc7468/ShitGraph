@@ -43,15 +43,15 @@ namespace ShitGraph {
 		EventAdaptor& operator=(const EventAdaptor&) = delete;
 
 	public:
-		virtual void Paint(PaintEventArgs e) = 0;
-		virtual void Destroy() = 0;
+		virtual void Paint(PaintEventArgs e);
+		virtual void Destroy();
 
-		virtual void MouseDown(MouseEventArgs e) = 0;
-		virtual void MouseUp(MouseEventArgs e) = 0;
-		virtual void MouseMove(MouseEventArgs e) = 0;
-		virtual void MouseWheel(MouseWheelEventArgs e) = 0;
+		virtual void MouseDown(MouseEventArgs e);
+		virtual void MouseUp(MouseEventArgs e);
+		virtual void MouseMove(MouseEventArgs e);
+		virtual void MouseWheel(MouseWheelEventArgs e);
 
-		virtual void KeyDown(KeyEventArgs e) = 0;
+		virtual void KeyDown(KeyEventArgs e);
 	};
 }
 

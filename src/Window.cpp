@@ -3,6 +3,18 @@
 #include <cassert>
 
 namespace ShitGraph {
+	void EventAdaptor::Paint(PaintEventArgs) {}
+	void EventAdaptor::Destroy() {}
+
+	void EventAdaptor::MouseDown(MouseEventArgs) {}
+	void EventAdaptor::MouseUp(MouseEventArgs) {}
+	void EventAdaptor::MouseMove(MouseEventArgs) {}
+	void EventAdaptor::MouseWheel(MouseWheelEventArgs) {}
+
+	void EventAdaptor::KeyDown(KeyEventArgs) {}
+}
+
+namespace ShitGraph {
 	Window::Window(EventAdaptor* eventAdaptor) noexcept
 		: m_EventAdaptor(eventAdaptor) {
 		assert(eventAdaptor);

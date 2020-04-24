@@ -56,8 +56,8 @@ namespace ShitGraph {
 			const HDC dc = BeginPaint(m_Handle, &ps);
 			const RECT clientRectApi = GetClientRect();
 			const Rectangle clientRect = {
-				{ clientRectApi.left, clientRectApi.top },
-				{ clientRectApi.right, clientRectApi.bottom },
+				{ static_cast<Scalar>(clientRectApi.left), static_cast<Scalar>(clientRectApi.top) },
+				{ static_cast<Scalar>(clientRectApi.right), static_cast<Scalar>(clientRectApi.bottom) },
 			};
 
 			const HDC bufferDc = CreateCompatibleDC(dc);
