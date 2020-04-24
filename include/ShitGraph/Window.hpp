@@ -68,6 +68,10 @@ namespace ShitGraph {
 	public:
 		Window& operator=(const Window&) = delete;
 
+	public:
+		virtual void Show() = 0;
+		virtual void Hide() = 0;
+
 	protected:
 		void Paint(GraphicDevice& device);
 		void Destroy();
@@ -78,5 +82,20 @@ namespace ShitGraph {
 		void MouseWheel(int delta);
 
 		void KeyDown(int key);
+	};
+}
+
+namespace ShitGraph {
+	class Application {
+	public:
+		Application() noexcept = default;
+		Application(const Application&) = delete;
+		virtual ~Application() = default;
+
+	public:
+		Application& operator=(const Application&) = delete;
+
+	public:
+		virtual int Run() = 0;
 	};
 }

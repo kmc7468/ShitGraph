@@ -15,6 +15,13 @@ namespace ShitGraph {
 		DestroyWindow(m_Handle);
 	}
 
+	void Win32Window::Show() {
+		ShowWindow(m_Handle, SW_SHOW);
+	}
+	void Win32Window::Hide() {
+		ShowWindow(m_Handle, SW_HIDE);
+	}
+
 	void Win32Window::CreateHandle(HINSTANCE instance, const wchar_t* title) {
 		static const wchar_t* className = CreateClass(instance);
 		m_Handle = CreateWindow(className, title, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 640, 480,
@@ -89,6 +96,17 @@ namespace ShitGraph {
 		RECT rect;
 		::GetClientRect(m_Handle, &rect);
 		return rect;
+	}
+}
+
+namespace ShitGraph {
+	int Win32Application::Run() {
+		MSG message;
+		while (GetMessage(&message, nullptr, 0, 0)) {
+			TranslateMessage(&message);
+			DispatchMessage(&message);
+		}
+		return static_cast<int>(message.wParam);
 	}
 }
 #endif

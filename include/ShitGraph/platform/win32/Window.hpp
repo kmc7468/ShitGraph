@@ -19,12 +19,31 @@ namespace ShitGraph {
 	public:
 		Win32Window& operator=(const Win32Window&) = delete;
 
+	public:
+		virtual void Show() override;
+		virtual void Hide() override;
+
 	private:
 		void CreateHandle(HINSTANCE instance, const wchar_t* title);
 		static const wchar_t* CreateClass(HINSTANCE instance);
 		static LRESULT CALLBACK WndProc(HWND handle, UINT message, WPARAM wParam, LPARAM lParam);
 		void AdaptEvent(UINT message, WPARAM wParam, LPARAM lParam);
 		RECT GetClientRect() const noexcept;
+	};
+}
+
+namespace ShitGraph {
+	class Win32Application final : public Application {
+	public:
+		Win32Application() noexcept = default;
+		Win32Application(const Win32Application&) = delete;
+		virtual ~Win32Application() = default;
+
+	public:
+		Win32Application& operator=(const Win32Application&) = delete;
+
+	public:
+		virtual int Run() override;
 	};
 }
 #endif
