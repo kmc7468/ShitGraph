@@ -92,7 +92,7 @@ namespace ShitGraph {
 		Scalar m_Scale;
 
 	public:
-		Graphs(Scalar scale = 0.262144) noexcept;
+		Graphs(Scalar scale) noexcept;
 		Graphs(const Graphs&) = delete;
 		~Graphs() = default;
 
@@ -138,7 +138,7 @@ namespace ShitGraph {
 		bool m_IsMoving = false;
 
 	public:
-		Renderer() noexcept = default;
+		Renderer() noexcept;
 		Renderer(const Renderer&) = delete;
 		virtual ~Renderer() override = default;
 

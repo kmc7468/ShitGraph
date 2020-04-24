@@ -133,6 +133,8 @@ namespace ShitGraph {
 }
 
 namespace ShitGraph {
+	Renderer::Renderer() noexcept
+		: m_Graphs(INITIALLY_SCALE) {}
 	const Graphs& Renderer::GetGraphs() const noexcept {
 		return m_Graphs;
 	}
