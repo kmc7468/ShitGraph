@@ -2,7 +2,10 @@
 
 #include <ShitGraph/CoreType.hpp>
 #include <ShitGraph/Graphic.hpp>
+#include <ShitGraph/Sampler.hpp>
+#include <ShitGraph/Window.hpp>
 
+#include <optional>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -49,17 +52,24 @@ namespace ShitGraph {
 	}
 
 	class Graph : public GraphClass {
+	private:
+		const Sampler* m_Sampler = nullptr;
+
 	public:
-		explicit Graph(const GraphClass& graphClass) noexcept;
+		Graph(const Sampler* sampler, const GraphClass& graphClass) noexcept;
 		Graph(const Graph&) = delete;
-		virtual ~Graph() = default;
+		virtual ~Graph();
 
 	public:
 		Graph& operator=(const Graph&) = delete;
 
 	public:
-		Vector Solve(Scalar independent) const;
+		std::vector<Line> Sample(const SamplingContext& context) const;
 		bool IsContinuous(Point from, Point to) const;
+
+		Scalar Independent(const Point& point) const noexcept;
+		Scalar Dependent(const Point& point) const noexcept;
+		Point XY(Scalar independent, Scalar dependent) const noexcept;
 
 		Graph* MakeForY() noexcept;
 		Graph* MakeForX() noexcept;
@@ -70,7 +80,6 @@ namespace ShitGraph {
 		bool MakeInvisible() noexcept;
 
 	protected:
-		virtual void Solve(Scalar x, Vector& y) const = 0;
 		virtual bool CheckContinuity(const Point& from, const Point& to) const = 0;
 	};
 }
@@ -105,23 +114,55 @@ namespace ShitGraph {
 
 		void Render(GraphicDevice& device) const;
 
-	private:
-		std::vector<std::vector<Point>> GetPoints(const GraphicDevice& device, const Rectangle& rect, const Rectangle& rectP, const Graph* graph) const;
-		bool ShouldDraw(const Rectangle& rect, const Graph* graph, Scalar dep) const noexcept;
-
 	public:
 		Point Logical(int width, int height, const Point& point) const noexcept;
 		Point Physical(int width, int height, const Point& point) const noexcept;
 
 	private:
-		Point Logical(const GraphicDevice& device, const Point& point) const noexcept;
 		Rectangle Logical(const GraphicDevice& device, const Rectangle& rectangle) const noexcept;
-		Point Physical(const GraphicDevice& device, const Point& point) const noexcept;
+	};
+}
 
-		Scalar Independent(const Graph* graph, const Point& point) const noexcept;
-		Scalar Dependent(const Graph* graph, const Point& point) const noexcept;
-		Point XY(const Graph* graph, const Point& point) const noexcept;
-		Scalar LogicalIndependent(const GraphicDevice& device, const Graph* graph, Scalar independent) const noexcept;
-		Scalar PhysicalDependent(const GraphicDevice& device, const Graph* graph, Scalar dependent) const noexcept;
+namespace ShitGraph {
+	class Renderer final : public EventAdaptor {
+	public:
+		static constexpr Scalar INITIALLY_SCALE = 0.01002259575;
+		static constexpr Scalar MAGNIFICATION = 1 / 0.75;
+
+	private:
+		Graphs m_Graphs;
+		std::optional<std::size_t> m_CurrentIndex;
+		bool m_OriginalVisible = true;
+
+		int m_MouseX = 0, m_MouseY = 0;
+		bool m_IsMoving = false;
+
+	public:
+		Renderer() noexcept = default;
+		Renderer(const Renderer&) = delete;
+		virtual ~Renderer() override = default;
+
+	public:
+		Renderer& operator=(const Renderer&) = delete;
+
+	public:
+		const Graphs& GetGraphs() const noexcept;
+		Graphs& GetGraphs() noexcept;
+
+	public:
+		virtual void Paint(PaintEventArgs e) override;
+		virtual void Destroy(EventArgs e) override;
+
+		virtual void MouseDown(MouseEventArgs e) override;
+		virtual void MouseUp(MouseEventArgs e) override;
+		virtual void MouseMove(MouseEventArgs e) override;
+		virtual void MouseWheel(MouseWheelEventArgs e) override;
+
+		virtual void KeyDown(KeyEventArgs e) override;
+
+	private:
+		void SetVisible(Window& window, bool newVisible) noexcept;
+		void Select(std::size_t index);
+		void Unselect(std::size_t index);
 	};
 }

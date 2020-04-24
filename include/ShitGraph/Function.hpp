@@ -2,6 +2,9 @@
 
 #include <ShitGraph/CoreType.hpp>
 #include <ShitGraph/Graph.hpp>
+#include <ShitGraph/Sampler.hpp>
+
+#include <vector>
 
 namespace ShitGraph {
 	class FunctionParameter {
@@ -23,7 +26,9 @@ namespace ShitGraph {
 	using CheckContinuityFunction = bool(*)(const Point& from, const Point& to);
 
 	bool ContinuousFunction(const Point& from, const Point& to);
+}
 
+namespace ShitGraph {
 	struct FunctionGraphClass : GraphClass {
 		const FunctionParameter* Parameter = nullptr;
 		CheckContinuityFunction CheckContinuity = nullptr;
@@ -35,7 +40,7 @@ namespace ShitGraph {
 		CheckContinuityFunction m_CheckContinuity = nullptr;
 
 	public:
-		explicit FunctionGraph(const FunctionGraphClass& graphClass) noexcept;
+		FunctionGraph(const Sampler* sampler, const FunctionGraphClass& graphClass) noexcept;
 		FunctionGraph(const FunctionGraph&) = delete;
 		virtual ~FunctionGraph() override;
 
@@ -45,6 +50,25 @@ namespace ShitGraph {
 	protected:
 		virtual bool CheckContinuity(const Point& from, const Point& to) const override;
 		const FunctionParameter* GetParameter() const noexcept;
+	};
+}
+
+namespace ShitGraph {
+	template<typename T>
+	class ExplicitFunctionSampler final : public Sampler {
+	public:
+		ExplicitFunctionSampler() noexcept = default;
+		ExplicitFunctionSampler(const ExplicitFunctionSampler&) = delete;
+		virtual ~ExplicitFunctionSampler() override = default;
+
+	public:
+		ExplicitFunctionSampler& operator=(const ExplicitFunctionSampler&) = delete;
+
+	public:
+		virtual std::vector<Line> Sample(const SamplingContext& context, const Graph* graph) const override;
+
+	private:
+		Vector Solve(const Graph* graph, Scalar indep) const;
 	};
 
 	using ExplicitFunction = bool(*)(const FunctionParameter* parameter, Point& point);
@@ -65,8 +89,8 @@ namespace ShitGraph {
 	public:
 		ExplicitFunctionGraph& operator=(const ExplicitFunctionGraph&) = delete;
 
-	protected:
-		virtual void Solve(Scalar x, Vector& y) const override;
+	public:
+		void Solve(Scalar x, Vector& y) const;
 	};
 
 	using MultivaluedExplicitFunction = void(*)(const FunctionParameter* parameter, Scalar x, Vector& y);
@@ -87,7 +111,44 @@ namespace ShitGraph {
 	public:
 		MultivaluedExplicitFunctionGraph& operator=(const MultivaluedExplicitFunctionGraph&) = delete;
 
-	protected:
-		virtual void Solve(Scalar x, Vector& y) const override;
+	public:
+		void Solve(Scalar x, Vector& y) const;
+	};
+}
+
+namespace ShitGraph {
+	class ImplicitFunctionSampler final : public Sampler {
+	public:
+		ImplicitFunctionSampler() noexcept = default;
+		ImplicitFunctionSampler(const ImplicitFunctionSampler&) = delete;
+		virtual ~ImplicitFunctionSampler() override = default;
+
+	public:
+		ImplicitFunctionSampler& operator=(const ImplicitFunctionSampler&) = delete;
+
+	public:
+		virtual std::vector<Line> Sample(const SamplingContext& context, const Graph* graph) const override;
+	};
+
+	using ImplicitFunction = bool(*)(const Point& point);
+
+	struct ImplicitFunctionClass : FunctionGraphClass {
+		ImplicitFunction Function = nullptr;
+	};
+
+	class ImplicitFunctionGraph final : public FunctionGraph {
+	private:
+		ImplicitFunction m_Function = nullptr;
+
+	public:
+		explicit ImplicitFunctionGraph(const ImplicitFunctionClass& graphClass) noexcept;
+		ImplicitFunctionGraph(const ImplicitFunctionGraph&) = delete;
+		virtual ~ImplicitFunctionGraph() override = default;
+
+	public:
+		ImplicitFunctionGraph& operator=(const ImplicitFunctionGraph&) = delete;
+
+	public:
+		bool CheckTrue(const Point& point) const;
 	};
 }

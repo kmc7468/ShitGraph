@@ -2,18 +2,18 @@
 
 #include <algorithm>
 #include <cassert>
-#include <memory>
+#include <chrono>
 
 namespace ShitGraph {
-	Graph::Graph(const GraphClass& graphClass) noexcept
-		: GraphClass(graphClass) {}
+	Graph::Graph(const Sampler* sampler, const GraphClass& graphClass) noexcept
+		: GraphClass(graphClass), m_Sampler(sampler) {}
+	Graph::~Graph() {
+		delete m_Sampler;
+	}
 
-	Vector Graph::Solve(Scalar independent) const {
+	std::vector<Line> Graph::Sample(const SamplingContext& context) const {
 		if (!Visible) return {};
-
-		Vector dependent;
-		Solve(independent, dependent);
-		return dependent;
+		else return m_Sampler->Sample(context, this);
 	}
 	bool Graph::IsContinuous(Point from, Point to) const {
 		if (IndependentVariable == ShitGraph::IndependentVariable::Y) {
@@ -21,6 +21,17 @@ namespace ShitGraph {
 			std::swap(to.X, to.Y);
 		}
 		return CheckContinuity(from, to);
+	}
+
+	Scalar Graph::Independent(const Point& point) const noexcept {
+		return IndependentVariable == IndependentVariable::X ? point.X : point.Y;
+	}
+	Scalar Graph::Dependent(const Point& point) const noexcept {
+		return IndependentVariable == IndependentVariable::Y ? point.X : point.Y;
+	}
+	Point Graph::XY(Scalar independent, Scalar dependent) const noexcept {
+		if (IndependentVariable == ShitGraph::IndependentVariable::X) return { independent, dependent };
+		else return { dependent, independent };
 	}
 
 	Graph* Graph::MakeForY() noexcept {
@@ -85,71 +96,21 @@ namespace ShitGraph {
 	void Graphs::Render(GraphicDevice& device) const {
 		const Rectangle rectP = device.GetRectangle();
 		const Rectangle rect = Logical(device, rectP);
+		const SamplingContext samplingContext{ rect, rectP, m_Center, m_Scale };
 
 		for (const Graph* const graph : m_Graphs) {
 			const ManagedGraphicObject<Pen> graphPen(device, device.Pen(graph->Color, graph->Width));
-			const std::vector<std::vector<Point>> points = GetPoints(device, rect, rectP, graph);
+			const ManagedGraphicObject<Brush> graphBrush(device, device.SolidBrush(graph->Color));
 
-			for (const auto& area : points) {
-				for (std::size_t begin = 0, i = 0; i < area.size(); ++i) {
-					if (i == area.size() - 1) {
-						device.DrawLines(graphPen, area.data() + begin, i - begin + 1);
-						break;
-					} else if (i != 0) {
-						const Point from = Logical(device, area[i - 1]);
-						const Point to = Logical(device, area[i]);
-						if (!graph->IsContinuous(from, to)) {
-							device.DrawLines(graphPen, area.data() + begin, i - begin);
-							begin = i;
-						}
-					}
+			const std::vector<Line> lines = graph->Sample(samplingContext);
+			for (const Line& line : lines) {
+				if (line.size() == 1) {
+					device.DrawPoint(graphBrush, line.front(), graph->Width);
+				} else if (line.size() > 1) {
+					device.DrawLines(graphPen, line.data(), line.size());
 				}
 			}
 		}
-	}
-
-	std::vector<std::vector<Point>> Graphs::GetPoints(const GraphicDevice& device, const Rectangle& rect, const Rectangle& rectP, const Graph* graph) const {
-		std::vector<std::vector<Point>> points;
-		const int pointCount = static_cast<int>(Independent(graph, rectP.RightBottom));
-
-		Vector prevDeps;
-		bool prevDrawed = false;
-
-		for (int indepP = 0; indepP < pointCount; ++indepP) {
-			const Scalar indep = LogicalIndependent(device, graph, indepP);
-			Vector deps = graph->Solve(indep);
-			if (points.empty() && !deps.empty()) {
-				points.resize(deps.size());
-			}
-
-			bool drawed = false;
-			for (std::size_t i = 0; i < deps.size(); ++i) {
-				const Scalar dep = deps[i];
-				const bool shouldDraw = ShouldDraw(rect, graph, dep);
-				if (shouldDraw || prevDrawed) {
-					const Scalar depP = PhysicalDependent(device, graph, dep);
-					points[i].push_back(XY(graph, { static_cast<Scalar>(indepP), depP }));
-				}
-				drawed |= shouldDraw;
-			}
-
-			if (!prevDrawed && drawed && indepP != 0) {
-				for (std::size_t i = 0; i < prevDeps.size(); ++i) {
-					const Scalar prevDep = prevDeps[i];
-					const Scalar prevDepP = PhysicalDependent(device, graph, prevDep);
-					points[i].insert(points[i].end() - (points[i].empty() ? 0 : 1), XY(graph, { static_cast<Scalar>(indepP - 1), prevDepP }));
-				}
-			}
-
-			prevDeps = std::move(deps);
-			prevDrawed = drawed;
-		}
-
-		return points;
-	}
-	bool Graphs::ShouldDraw(const Rectangle& rect, const Graph* graph, Scalar dep) const noexcept {
-		if (graph->IndependentVariable == IndependentVariable::X) return rect.RightBottom.Y <= dep && dep <= rect.LeftTop.Y;
-		else return rect.LeftTop.X <= dep && dep <= rect.RightBottom.X;
 	}
 
 	Point Graphs::Logical(int width, int height, const Point& point) const noexcept {
@@ -165,34 +126,143 @@ namespace ShitGraph {
 		};
 	}
 
-	Point Graphs::Logical(const GraphicDevice& device, const Point& point) const noexcept {
-		return Logical(device.GetWidth(), device.GetHeight(), point);
-	}
 	Rectangle Graphs::Logical(const GraphicDevice& device, const Rectangle& rectangle) const noexcept {
-		return {
-			Logical(device, rectangle.LeftTop),
-			Logical(device, rectangle.RightBottom)
-		};
+		return { Logical(device.GetWidth(), device.GetHeight(), rectangle.LeftTop),
+			Logical(device.GetWidth(), device.GetHeight(), rectangle.RightBottom) };
 	}
-	Point Graphs::Physical(const GraphicDevice& device, const Point& point) const noexcept {
-		return Physical(device.GetWidth(), device.GetHeight(), point);
+}
+
+namespace ShitGraph {
+	const Graphs& Renderer::GetGraphs() const noexcept {
+		return m_Graphs;
+	}
+	Graphs& Renderer::GetGraphs() noexcept {
+		return m_Graphs;
 	}
 
-	Scalar Graphs::Independent(const Graph* graph, const Point& point) const noexcept {
-		return graph->IndependentVariable == IndependentVariable::X ? point.X : point.Y;
+	void Renderer::Paint(PaintEventArgs e) {
+		const ManagedGraphicObject<Brush> blackBrush(e.Device, e.Device.SolidBrush({ 0, 0, 0 }));
+		const ManagedGraphicObject<Font> fpsFont(e.Device, e.Device.Font("Arial", 12));
+
+		const auto start = std::chrono::system_clock::now();
+		m_Graphs.Render(e.Device);
+		const auto end = std::chrono::system_clock::now();
+
+		const std::chrono::duration<double, std::milli> milli = end - start;
+		const int fps = static_cast<int>(1000 / milli.count());
+		e.Device.DrawString(fpsFont, blackBrush, { 0, 0 }, std::to_string(fps) + " fps");
+		if (m_CurrentIndex) {
+			e.Device.DrawString(fpsFont, blackBrush, { 0, 20 }, "Graph: " + std::to_string(*m_CurrentIndex + 1) + '/' + std::to_string(m_Graphs.GetGraphCount()));
+			e.Device.DrawString(fpsFont, blackBrush, { 0, 40 }, m_OriginalVisible ? "Visible" : "Invisible");
+		}
 	}
-	Scalar Graphs::Dependent(const Graph* graph, const Point& point) const noexcept {
-		return graph->IndependentVariable == IndependentVariable::Y ? point.X : point.Y;
+	void Renderer::Destroy(EventArgs e) {
+		e.Window.Exit();
 	}
-	Point Graphs::XY(const Graph* graph, const Point& point) const noexcept {
-		return graph->IndependentVariable == IndependentVariable::X ? point : Point{ point.Y, point.X };
+
+	void Renderer::MouseDown(MouseEventArgs e) {
+		m_MouseX = e.X;
+		m_MouseY = e.Y;
+		m_IsMoving = true;
 	}
-	Scalar Graphs::LogicalIndependent(const GraphicDevice& device, const Graph* graph, Scalar independent) const noexcept {
-		return Independent(graph, Logical(device,
-			graph->IndependentVariable == IndependentVariable::X ? Point{ independent, 0 } : Point{ 0, independent }));
+	void Renderer::MouseUp(MouseEventArgs) {
+		m_IsMoving = false;
 	}
-	Scalar Graphs::PhysicalDependent(const GraphicDevice& device, const Graph* graph, Scalar dependent) const noexcept {
-		return Dependent(graph, Physical(device,
-			graph->IndependentVariable == IndependentVariable::X ? Point{ 0, dependent } : Point{ dependent, 0 }));
+	void Renderer::MouseMove(MouseEventArgs e) {
+		if (m_IsMoving) {
+			const Point center = m_Graphs.GetCenter();
+			m_Graphs.SetCenter({
+				center.X - (m_MouseX - e.X) * m_Graphs.GetScale(),
+				center.Y + (m_MouseY - e.Y) * m_Graphs.GetScale()
+			});
+			e.Window.ReDraw();
+		}
+		m_MouseX = e.X;
+		m_MouseY = e.Y;
+	}
+	void Renderer::MouseWheel(MouseWheelEventArgs e) {
+		const Rectangle clientRect = e.Window.GetClientRect();
+		const Point mouse = m_Graphs.Logical(static_cast<int>(clientRect.RightBottom.X), static_cast<int>(clientRect.RightBottom.Y),
+			{ static_cast<Scalar>(m_MouseX), static_cast<Scalar>(m_MouseY) });
+		const Scalar delta = e.Delta > 0 ? 1 / MAGNIFICATION : MAGNIFICATION;
+		m_Graphs.SetScale(m_Graphs.GetScale() * delta);
+
+		if (e.ControlKey) {
+			const Point newMouse = m_Graphs.Logical(static_cast<int>(clientRect.RightBottom.X), static_cast<int>(clientRect.RightBottom.Y),
+				{ static_cast<Scalar>(m_MouseX), static_cast<Scalar>(m_MouseY) });
+			const Point center = m_Graphs.GetCenter();
+			m_Graphs.SetCenter({
+				center.X + (newMouse.X - mouse.X),
+				center.Y + (newMouse.Y - mouse.Y),
+			});
+		}
+
+		e.Window.ReDraw();
+	}
+
+	void Renderer::KeyDown(KeyEventArgs e) {
+		switch (e.Key) {
+		case 'O':
+			m_Graphs.SetCenter({ 0, 0 });
+			e.Window.ReDraw();
+			break;
+
+		case 'R':
+			m_Graphs.SetScale(INITIALLY_SCALE);
+			e.Window.ReDraw();
+			break;
+
+		case EscKey:
+			if (m_CurrentIndex) {
+				Unselect(*m_CurrentIndex);
+				m_CurrentIndex.reset();
+				e.Window.ReDraw();
+			}
+			break;
+
+		case UpKey: SetVisible(e.Window, true); break;
+		case DownKey: SetVisible(e.Window, false); break;
+
+		case LeftKey:
+			if (!m_CurrentIndex && m_Graphs.GetGraphCount()) {
+				const auto index = m_Graphs.GetGraphCount() - 1;
+				Select((m_CurrentIndex = index, index));
+				e.Window.ReDraw();
+			} else if (m_CurrentIndex && *m_CurrentIndex) {
+				Unselect(*m_CurrentIndex);
+				Select(*m_CurrentIndex -= 1);
+				e.Window.ReDraw();
+			}
+			break;
+
+		case RightKey:
+			if (!m_CurrentIndex && m_Graphs.GetGraphCount()) {
+				Select((m_CurrentIndex = 0, 0));
+				e.Window.ReDraw();
+			} else if (m_CurrentIndex && m_CurrentIndex < m_Graphs.GetGraphCount() - 1) {
+				Unselect(*m_CurrentIndex);
+				Select(*m_CurrentIndex += 1);
+				e.Window.ReDraw();
+			}
+			break;
+		}
+	}
+
+	void Renderer::SetVisible(Window& window, bool newVisible) noexcept {
+		if (m_CurrentIndex && m_OriginalVisible != newVisible) {
+			newVisible = m_OriginalVisible;
+			window.ReDraw();
+		}
+	}
+	void Renderer::Select(std::size_t index) {
+		const auto graph = m_Graphs.GetGraph(index);
+		graph->Width += 2;
+		m_OriginalVisible = graph->Visible;
+		graph->Visible = true;
+	}
+	void Renderer::Unselect(std::size_t index) {
+		const auto graph = m_Graphs.GetGraph(index);
+		graph->Width -= 2;
+		graph->Visible = m_OriginalVisible;
 	}
 }

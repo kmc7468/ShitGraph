@@ -60,9 +60,6 @@ namespace ShitGraph {
 	};
 }
 
-#pragma push_macro("CreateFont")
-#undef CreateFont
-
 namespace ShitGraph {
 	class Win32GraphicDevice final : public GraphicDevice {
 	private:
@@ -79,15 +76,13 @@ namespace ShitGraph {
 
 	public:
 		virtual void DrawLines(const ShitGraph::Pen* pen, const Point* points, std::size_t size) override;
+		virtual void DrawPoint(const ShitGraph::Brush* brush, const Point& point, Scalar radius) override;
 		virtual void DrawString(const ShitGraph::Font* font, const ShitGraph::Brush* brush, const Point& location, const std::string& string) override;
 
 	protected:
-		virtual ShitGraph::SolidBrush* CreateSolidBrush(const Color& color) override;
-		virtual ShitGraph::Pen* CreatePen(const Color& color, Scalar width) override;
-		virtual ShitGraph::Font* CreateFont(std::string name, Scalar size) override;
+		virtual ShitGraph::SolidBrush* AllocateSolidBrush(const Color& color) override;
+		virtual ShitGraph::Pen* AllocatePen(const Color& color, Scalar width) override;
+		virtual ShitGraph::Font* AllocateFont(std::string name, Scalar size) override;
 	};
 }
-
-#define CreateFont
-#pragma pop_macro("CreateFont")
 #endif

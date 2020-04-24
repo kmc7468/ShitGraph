@@ -14,6 +14,8 @@ namespace ShitGraph {
 	struct Rectangle final {
 		Point LeftTop, RightBottom;
 	};
+
+	using Line = std::vector<Point>;
 }
 
 namespace ShitGraph {

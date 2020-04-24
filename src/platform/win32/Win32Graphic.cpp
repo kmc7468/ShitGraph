@@ -71,6 +71,11 @@ namespace ShitGraph {
 
 		m_Graphics.DrawLines(static_cast<Gdiplus::Pen*>(pen->GetHandle()), pointsGdi.data(), static_cast<INT>(size));
 	}
+	void Win32GraphicDevice::DrawPoint(const ShitGraph::Brush* brush, const Point& point, Scalar radius) {
+		const Gdiplus::REAL width = static_cast<Gdiplus::REAL>(radius * 2);
+		m_Graphics.FillEllipse(static_cast<Gdiplus::Brush*>(brush->GetHandle()),
+			static_cast<Gdiplus::REAL>(point.X - radius), static_cast<Gdiplus::REAL>(point.Y - radius), width, width);
+	}
 	void Win32GraphicDevice::DrawString(const ShitGraph::Font* font, const ShitGraph::Brush* brush, const Point& location, const std::string& string) {
 		const std::wstring stringWide = WideChar(string);
 		m_Graphics.DrawString(stringWide.c_str(), static_cast<INT>(stringWide.size()), static_cast<Gdiplus::Font*>(font->GetHandle()),
@@ -79,13 +84,13 @@ namespace ShitGraph {
 
 #undef CreateFont
 
-	ShitGraph::SolidBrush* Win32GraphicDevice::CreateSolidBrush(const Color& color) {
+	ShitGraph::SolidBrush* Win32GraphicDevice::AllocateSolidBrush(const Color& color) {
 		return new Win32SolidBrush(color);
 	}
-	ShitGraph::Pen* Win32GraphicDevice::CreatePen(const Color& color, Scalar width) {
+	ShitGraph::Pen* Win32GraphicDevice::AllocatePen(const Color& color, Scalar width) {
 		return new Win32Pen(color, width);
 	}
-	ShitGraph::Font* Win32GraphicDevice::CreateFont(std::string name, Scalar size) {
+	ShitGraph::Font* Win32GraphicDevice::AllocateFont(std::string name, Scalar size) {
 		return new Win32Font(std::move(name), size);
 	}
 }
