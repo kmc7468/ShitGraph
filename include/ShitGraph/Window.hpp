@@ -54,3 +54,18 @@ namespace ShitGraph {
 		virtual void KeyDown(KeyEventArgs e) = 0;
 	};
 }
+
+namespace ShitGraph {
+	class Window {
+	private:
+		EventAdaptor* m_EventAdaptor = nullptr;
+
+	public:
+		explicit Window(EventAdaptor* eventAdaptor) noexcept;
+		Window(const Window&) = delete;
+		virtual ~Window();
+
+	public:
+		Window& operator=(const Window&) = delete;
+	};
+}
