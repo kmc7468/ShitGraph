@@ -3,7 +3,9 @@
 #include <ShitGraph/CoreType.hpp>
 #include <ShitGraph/Graphic.hpp>
 #include <ShitGraph/Sampler.hpp>
+#include <ShitGraph/Window.hpp>
 
+#include <optional>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -118,5 +120,49 @@ namespace ShitGraph {
 
 	private:
 		Rectangle Logical(const GraphicDevice& device, const Rectangle& rectangle) const noexcept;
+	};
+}
+
+namespace ShitGraph {
+	class Renderer final : public EventAdaptor {
+	public:
+		static constexpr Scalar INITIALLY_SCALE = 0.01002259575;
+		static constexpr Scalar MAGNIFICATION = 1 / 0.75;
+
+	private:
+		Graphs m_Graphs;
+		std::optional<std::size_t> m_CurrentIndex;
+		bool m_OriginalVisible = true;
+
+		int m_MouseX = 0, m_MouseY = 0;
+		bool m_IsMoving = false;
+
+	public:
+		Renderer() noexcept = default;
+		Renderer(const Renderer&) = delete;
+		virtual ~Renderer() override = default;
+
+	public:
+		Renderer& operator=(const Renderer&) = delete;
+
+	public:
+		const Graphs& GetGraphs() const noexcept;
+		Graphs& GetGraphs() noexcept;
+
+	public:
+		virtual void Paint(PaintEventArgs e) override;
+		virtual void Destroy(EventArgs e) override;
+
+		virtual void MouseDown(MouseEventArgs e) override;
+		virtual void MouseUp(MouseEventArgs e) override;
+		virtual void MouseMove(MouseEventArgs e) override;
+		virtual void MouseWheel(MouseWheelEventArgs e) override;
+
+		virtual void KeyDown(KeyEventArgs e) override;
+
+	private:
+		void SetVisible(Window& window, bool newVisible) noexcept;
+		void Select(std::size_t index);
+		void Unselect(std::size_t index);
 	};
 }

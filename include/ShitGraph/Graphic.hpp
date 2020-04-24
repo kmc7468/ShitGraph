@@ -118,9 +118,9 @@ namespace ShitGraph {
 		virtual void DrawString(const ShitGraph::Font* font, const ShitGraph::Brush* brush, const Point& location, const std::string& string) = 0;
 
 	protected:
-		virtual ShitGraph::SolidBrush* CreateSolidBrush(const Color& color) = 0;
-		virtual ShitGraph::Pen* CreatePen(const Color& color, Scalar width) = 0;
-		virtual ShitGraph::Font* CreateFont(std::string name, Scalar size) = 0;
+		virtual ShitGraph::SolidBrush* AllocateSolidBrush(const Color& color) = 0;
+		virtual ShitGraph::Pen* AllocatePen(const Color& color, Scalar width) = 0;
+		virtual ShitGraph::Font* AllocateFont(std::string name, Scalar size) = 0;
 	};
 
 	template<typename T>

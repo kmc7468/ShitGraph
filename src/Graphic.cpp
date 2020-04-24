@@ -59,7 +59,7 @@ namespace ShitGraph {
 	}
 
 	ShitGraph::SolidBrush* GraphicDevice::SolidBrush(const Color& color) {
-		const auto result = CreateSolidBrush(color);
+		const auto result = AllocateSolidBrush(color);
 		return m_Objects.push_back(result), result;
 	}
 	ShitGraph::Pen* GraphicDevice::Pen(const Color& color) {
@@ -67,11 +67,11 @@ namespace ShitGraph {
 		return m_Objects.push_back(result), result;
 	}
 	ShitGraph::Pen* GraphicDevice::Pen(const Color& color, Scalar width) {
-		const auto result = CreatePen(color, width);
+		const auto result = AllocatePen(color, width);
 		return m_Objects.push_back(result), result;
 	}
 	ShitGraph::Font* GraphicDevice::Font(std::string name, Scalar size) {
-		const auto result = CreateFont(std::move(name), size);
+		const auto result = AllocateFont(std::move(name), size);
 		return m_Objects.push_back(result), result;
 	}
 	void GraphicDevice::Delete(GraphicObject* object) {

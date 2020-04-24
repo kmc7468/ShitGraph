@@ -84,13 +84,13 @@ namespace ShitGraph {
 
 #undef CreateFont
 
-	ShitGraph::SolidBrush* Win32GraphicDevice::CreateSolidBrush(const Color& color) {
+	ShitGraph::SolidBrush* Win32GraphicDevice::AllocateSolidBrush(const Color& color) {
 		return new Win32SolidBrush(color);
 	}
-	ShitGraph::Pen* Win32GraphicDevice::CreatePen(const Color& color, Scalar width) {
+	ShitGraph::Pen* Win32GraphicDevice::AllocatePen(const Color& color, Scalar width) {
 		return new Win32Pen(color, width);
 	}
-	ShitGraph::Font* Win32GraphicDevice::CreateFont(std::string name, Scalar size) {
+	ShitGraph::Font* Win32GraphicDevice::AllocateFont(std::string name, Scalar size) {
 		return new Win32Font(std::move(name), size);
 	}
 }
