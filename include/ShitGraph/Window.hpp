@@ -8,17 +8,17 @@ namespace ShitGraph {
 		ShitGraph::Window& Window;
 	};
 
-	struct PaintEventArgs final {
+	struct PaintEventArgs final : EventArgs {
 		GraphicDevice& Device;
 	};
 
 	enum class MouseButton {
 		None,
 
-		LButton,
+		Left,
 	};
 
-	struct MouseEventArgs final {
+	struct MouseEventArgs final : EventArgs {
 		int X, Y;
 		MouseButton Button;
 	};
@@ -27,7 +27,7 @@ namespace ShitGraph {
 		int Delta;
 	};
 
-	struct KeyEventArgs final {
+	struct KeyEventArgs final : EventArgs {
 		int Key;
 	};
 }
@@ -67,5 +67,16 @@ namespace ShitGraph {
 
 	public:
 		Window& operator=(const Window&) = delete;
+
+	protected:
+		void Paint(GraphicDevice& device);
+		void Destroy();
+
+		void MouseDown(int x, int y, MouseButton button);
+		void MouseUp(int x, int y, MouseButton button);
+		void MouseMove(int x, int y);
+		void MouseWheel(int delta);
+
+		void KeyDown(int key);
 	};
 }
