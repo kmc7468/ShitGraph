@@ -4,7 +4,7 @@
 
 namespace ShitGraph {
 	void EventAdaptor::Paint(PaintEventArgs) {}
-	void EventAdaptor::Destroy() {}
+	void EventAdaptor::Destroy(EventArgs) {}
 
 	void EventAdaptor::MouseDown(MouseEventArgs) {}
 	void EventAdaptor::MouseUp(MouseEventArgs) {}
@@ -28,7 +28,8 @@ namespace ShitGraph {
 		m_EventAdaptor->Paint(e);
 	}
 	void Window::Destroy() {
-		m_EventAdaptor->Destroy();
+		EventArgs e{ *this };
+		m_EventAdaptor->Destroy(e);
 	}
 
 	void Window::MouseDown(int x, int y, MouseButton button) {
@@ -43,8 +44,8 @@ namespace ShitGraph {
 		MouseEventArgs e{ *this, x, y, MouseButton::None };
 		m_EventAdaptor->MouseMove(e);
 	}
-	void Window::MouseWheel(int delta) {
-		MouseWheelEventArgs e{ *this, delta };
+	void Window::MouseWheel(int delta, bool controlKey) {
+		MouseWheelEventArgs e{ *this, delta, controlKey };
 		m_EventAdaptor->MouseWheel(e);
 	}
 

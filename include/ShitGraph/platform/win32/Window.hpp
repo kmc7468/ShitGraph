@@ -21,14 +21,18 @@ namespace ShitGraph {
 
 	public:
 		virtual void Show() override;
+		void Show(int cmdShow);
 		virtual void Hide() override;
+		virtual void Exit() override;
+		virtual void ReDraw() override;
+		virtual Rectangle GetClientRect() const noexcept override;
 
 	private:
 		void CreateHandle(HINSTANCE instance, const wchar_t* title);
 		static const wchar_t* CreateClass(HINSTANCE instance);
 		static LRESULT CALLBACK WndProc(HWND handle, UINT message, WPARAM wParam, LPARAM lParam);
-		void AdaptEvent(UINT message, WPARAM wParam, LPARAM lParam);
-		RECT GetClientRect() const noexcept;
+		LRESULT AdaptEvent(UINT message, WPARAM wParam, LPARAM lParam);
+		RECT GetClientRectApi() const noexcept;
 	};
 }
 
@@ -37,12 +41,13 @@ namespace ShitGraph {
 	public:
 		Win32Application() noexcept = default;
 		Win32Application(const Win32Application&) = delete;
-		virtual ~Win32Application() = default;
+		virtual ~Win32Application() override;
 
 	public:
 		Win32Application& operator=(const Win32Application&) = delete;
 
 	public:
+		virtual void Initialize() override;
 		virtual int Run() override;
 	};
 }

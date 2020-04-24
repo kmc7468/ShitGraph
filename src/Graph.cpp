@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 
 namespace ShitGraph {
 	Graph::Graph(const Sampler* sampler, const GraphClass& graphClass) noexcept
@@ -128,5 +129,140 @@ namespace ShitGraph {
 	Rectangle Graphs::Logical(const GraphicDevice& device, const Rectangle& rectangle) const noexcept {
 		return { Logical(device.GetWidth(), device.GetHeight(), rectangle.LeftTop),
 			Logical(device.GetWidth(), device.GetHeight(), rectangle.RightBottom) };
+	}
+}
+
+namespace ShitGraph {
+	const Graphs& Renderer::GetGraphs() const noexcept {
+		return m_Graphs;
+	}
+	Graphs& Renderer::GetGraphs() noexcept {
+		return m_Graphs;
+	}
+
+	void Renderer::Paint(PaintEventArgs e) {
+		const ManagedGraphicObject<Brush> blackBrush(e.Device, e.Device.SolidBrush({ 0, 0, 0 }));
+		const ManagedGraphicObject<Font> fpsFont(e.Device, e.Device.Font("Arial", 12));
+
+		const auto start = std::chrono::system_clock::now();
+		m_Graphs.Render(e.Device);
+		const auto end = std::chrono::system_clock::now();
+
+		const std::chrono::duration<double, std::milli> milli = end - start;
+		const int fps = static_cast<int>(1000 / milli.count());
+		e.Device.DrawString(fpsFont, blackBrush, { 0, 0 }, std::to_string(fps) + " fps");
+		if (m_CurrentIndex) {
+			e.Device.DrawString(fpsFont, blackBrush, { 0, 20 }, "Graph: " + std::to_string(*m_CurrentIndex + 1) + '/' + std::to_string(m_Graphs.GetGraphCount()));
+			e.Device.DrawString(fpsFont, blackBrush, { 0, 40 }, m_OriginalVisible ? "Visible" : "Invisible");
+		}
+	}
+	void Renderer::Destroy(EventArgs e) {
+		e.Window.Exit();
+	}
+
+	void Renderer::MouseDown(MouseEventArgs e) {
+		m_MouseX = e.X;
+		m_MouseY = e.Y;
+		m_IsMoving = true;
+	}
+	void Renderer::MouseUp(MouseEventArgs) {
+		m_IsMoving = false;
+	}
+	void Renderer::MouseMove(MouseEventArgs e) {
+		if (m_IsMoving) {
+			const Point center = m_Graphs.GetCenter();
+			m_Graphs.SetCenter({
+				center.X - (m_MouseX - e.X) * m_Graphs.GetScale(),
+				center.Y + (m_MouseY - e.Y) * m_Graphs.GetScale()
+			});
+			e.Window.ReDraw();
+		}
+		m_MouseX = e.X;
+		m_MouseY = e.Y;
+	}
+	void Renderer::MouseWheel(MouseWheelEventArgs e) {
+		const Rectangle clientRect = e.Window.GetClientRect();
+		const Point mouse = m_Graphs.Logical(static_cast<int>(clientRect.RightBottom.X), static_cast<int>(clientRect.RightBottom.Y),
+			{ static_cast<Scalar>(m_MouseX), static_cast<Scalar>(m_MouseY) });
+		const Scalar delta = e.Delta > 0 ? 1 / MAGNIFICATION : MAGNIFICATION;
+		m_Graphs.SetScale(m_Graphs.GetScale() * delta);
+
+		if (e.ControlKey) {
+			const Point newMouse = m_Graphs.Logical(static_cast<int>(clientRect.RightBottom.X), static_cast<int>(clientRect.RightBottom.Y),
+				{ static_cast<Scalar>(m_MouseX), static_cast<Scalar>(m_MouseY) });
+			const Point center = m_Graphs.GetCenter();
+			m_Graphs.SetCenter({
+				center.X + (newMouse.X - mouse.X),
+				center.Y + (newMouse.Y - mouse.Y),
+			});
+		}
+
+		e.Window.ReDraw();
+	}
+
+	void Renderer::KeyDown(KeyEventArgs e) {
+		switch (e.Key) {
+		case 'O':
+			m_Graphs.SetCenter({ 0, 0 });
+			e.Window.ReDraw();
+			break;
+
+		case 'R':
+			m_Graphs.SetScale(INITIALLY_SCALE);
+			e.Window.ReDraw();
+			break;
+
+		case EscKey:
+			if (m_CurrentIndex) {
+				Unselect(*m_CurrentIndex);
+				m_CurrentIndex.reset();
+				e.Window.ReDraw();
+			}
+			break;
+
+		case UpKey: SetVisible(e.Window, true); break;
+		case DownKey: SetVisible(e.Window, false); break;
+
+		case LeftKey:
+			if (!m_CurrentIndex && m_Graphs.GetGraphCount()) {
+				const auto index = m_Graphs.GetGraphCount() - 1;
+				Select((m_CurrentIndex = index, index));
+				e.Window.ReDraw();
+			} else if (m_CurrentIndex && *m_CurrentIndex) {
+				Unselect(*m_CurrentIndex);
+				Select(*m_CurrentIndex -= 1);
+				e.Window.ReDraw();
+			}
+			break;
+
+		case RightKey:
+			if (!m_CurrentIndex && m_Graphs.GetGraphCount()) {
+				Select((m_CurrentIndex = 0, 0));
+				e.Window.ReDraw();
+			} else if (m_CurrentIndex && m_CurrentIndex < m_Graphs.GetGraphCount() - 1) {
+				Unselect(*m_CurrentIndex);
+				Select(*m_CurrentIndex += 1);
+				e.Window.ReDraw();
+			}
+			break;
+		}
+	}
+
+	void Renderer::SetVisible(Window& window, bool newVisible) noexcept {
+		if (m_CurrentIndex && m_OriginalVisible != newVisible) {
+			newVisible = m_OriginalVisible;
+			window.ReDraw();
+		}
+	}
+	void Renderer::Select(std::size_t index) {
+		const auto graph = m_Graphs.GetGraph(index);
+		graph->Width += 2;
+		m_OriginalVisible = graph->Visible;
+		graph->Visible = true;
+	}
+	void Renderer::Unselect(std::size_t index) {
+		const auto graph = m_Graphs.GetGraph(index);
+		graph->Width -= 2;
+		graph->Visible = m_OriginalVisible;
 	}
 }

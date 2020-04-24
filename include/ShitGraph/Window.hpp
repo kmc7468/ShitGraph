@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ShitGraph/CoreType.hpp>
+
 namespace ShitGraph {
 	class Window;
 	class GraphicDevice;
@@ -25,7 +27,14 @@ namespace ShitGraph {
 
 	struct MouseWheelEventArgs final : EventArgs {
 		int Delta;
+		bool ControlKey;
 	};
+
+	static constexpr int EscKey = 0x1B;
+	static constexpr int UpKey = 0x26;
+	static constexpr int DownKey = 0x28;
+	static constexpr int LeftKey = 0x25;
+	static constexpr int RightKey = 0x27;
 
 	struct KeyEventArgs final : EventArgs {
 		int Key;
@@ -44,7 +53,7 @@ namespace ShitGraph {
 
 	public:
 		virtual void Paint(PaintEventArgs e);
-		virtual void Destroy();
+		virtual void Destroy(EventArgs e);
 
 		virtual void MouseDown(MouseEventArgs e);
 		virtual void MouseUp(MouseEventArgs e);
@@ -71,6 +80,9 @@ namespace ShitGraph {
 	public:
 		virtual void Show() = 0;
 		virtual void Hide() = 0;
+		virtual void Exit() = 0;
+		virtual void ReDraw() = 0;
+		virtual Rectangle GetClientRect() const noexcept = 0;
 
 	protected:
 		void Paint(GraphicDevice& device);
@@ -79,7 +91,7 @@ namespace ShitGraph {
 		void MouseDown(int x, int y, MouseButton button);
 		void MouseUp(int x, int y, MouseButton button);
 		void MouseMove(int x, int y);
-		void MouseWheel(int delta);
+		void MouseWheel(int delta, bool controlKey);
 
 		void KeyDown(int key);
 	};
@@ -96,6 +108,7 @@ namespace ShitGraph {
 		Application& operator=(const Application&) = delete;
 
 	public:
+		virtual void Initialize() = 0;
 		virtual int Run() = 0;
 	};
 }

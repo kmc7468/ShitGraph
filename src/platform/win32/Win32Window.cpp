@@ -2,9 +2,11 @@
 
 #ifdef SHITGRAPH_WIN32
 #include <ShitGraph/CoreType.hpp>
+#include <ShitGraph/platform/win32/Gdiplus.hpp>
 #include <ShitGraph/platform/win32/Graphic.hpp>
 
 #include <stdexcept>
+#include <windowsx.h>
 
 namespace ShitGraph {
 	Win32Window::Win32Window(EventAdaptor* eventAdaptor, HINSTANCE instance, const wchar_t* title)
@@ -18,8 +20,25 @@ namespace ShitGraph {
 	void Win32Window::Show() {
 		ShowWindow(m_Handle, SW_SHOW);
 	}
+	void Win32Window::Show(int cmdShow) {
+		ShowWindow(m_Handle, cmdShow);
+	}
 	void Win32Window::Hide() {
 		ShowWindow(m_Handle, SW_HIDE);
+	}
+	void Win32Window::Exit() {
+		PostQuitMessage(0);
+	}
+	void Win32Window::ReDraw() {
+		InvalidateRect(m_Handle, nullptr, false);
+	}
+	Rectangle Win32Window::GetClientRect() const noexcept {
+		const RECT clientRectApi = GetClientRectApi();
+		const Rectangle clientRect = {
+			{ static_cast<Scalar>(clientRectApi.left), static_cast<Scalar>(clientRectApi.top) },
+			{ static_cast<Scalar>(clientRectApi.right), static_cast<Scalar>(clientRectApi.bottom) },
+		};
+		return clientRect;
 	}
 
 	void Win32Window::CreateHandle(HINSTANCE instance, const wchar_t* title) {
@@ -51,21 +70,16 @@ namespace ShitGraph {
 	LRESULT CALLBACK Win32Window::WndProc(HWND handle, UINT message, WPARAM wParam, LPARAM lParam) {
 		const LONG_PTR longPtr = GetWindowLongPtr(handle, GWLP_USERDATA);
 		Win32Window* const window = reinterpret_cast<Win32Window*>(longPtr);
-		if (window) {
-			window->AdaptEvent(message, wParam, lParam);
-			return 0;
-		} else return DefWindowProc(handle, message, wParam, lParam);
+		if (window) return window->AdaptEvent(message, wParam, lParam);
+		else return DefWindowProc(handle, message, wParam, lParam);
 	}
-	void Win32Window::AdaptEvent(UINT message, WPARAM wParam, LPARAM lParam) {
+	LRESULT Win32Window::AdaptEvent(UINT message, WPARAM wParam, LPARAM lParam) {
 		switch (message) {
 		case WM_PAINT: {
 			PAINTSTRUCT ps;
 			const HDC dc = BeginPaint(m_Handle, &ps);
-			const RECT clientRectApi = GetClientRect();
-			const Rectangle clientRect = {
-				{ static_cast<Scalar>(clientRectApi.left), static_cast<Scalar>(clientRectApi.top) },
-				{ static_cast<Scalar>(clientRectApi.right), static_cast<Scalar>(clientRectApi.bottom) },
-			};
+			const RECT clientRectApi = GetClientRectApi();
+			const Rectangle clientRect = GetClientRect();
 
 			const HDC bufferDc = CreateCompatibleDC(dc);
 			const HBITMAP bufferBitmap = CreateCompatibleBitmap(dc, clientRectApi.right, clientRectApi.bottom);
@@ -80,19 +94,20 @@ namespace ShitGraph {
 			DeleteDC(bufferDc);
 
 			EndPaint(m_Handle, &ps);
-			break;
+			return 0;
 		}
-		case WM_DESTROY: Destroy(); break;
+		case WM_DESTROY: Destroy(); return 0;
 
-		case WM_LBUTTONDOWN: MouseDown(LOWORD(lParam), HIWORD(lParam), MouseButton::Left); break;
-		case WM_LBUTTONUP: MouseUp(LOWORD(lParam), HIWORD(lParam), MouseButton::Left); break;
-		case WM_MOUSEMOVE: MouseMove(LOWORD(lParam), HIWORD(lParam)); break;
-		case WM_MOUSEWHEEL: MouseWheel(static_cast<SHORT>(HIWORD(wParam))); break;
+		case WM_LBUTTONDOWN: MouseDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), MouseButton::Left); return 0;
+		case WM_LBUTTONUP: MouseUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), MouseButton::Left); return 0;
+		case WM_MOUSEMOVE: MouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)); return 0;
+		case WM_MOUSEWHEEL: MouseWheel(static_cast<SHORT>(HIWORD(wParam)), !(LOWORD(wParam) & MK_CONTROL)); return 0;
 
-		case WM_KEYDOWN: KeyDown(static_cast<int>(wParam)); break;
+		case WM_KEYDOWN: KeyDown(static_cast<int>(wParam)); return 0;
+		default: return DefWindowProc(m_Handle, message, wParam, lParam);
 		}
 	}
-	RECT Win32Window::GetClientRect() const noexcept {
+	RECT Win32Window::GetClientRectApi() const noexcept {
 		RECT rect;
 		::GetClientRect(m_Handle, &rect);
 		return rect;
@@ -100,6 +115,13 @@ namespace ShitGraph {
 }
 
 namespace ShitGraph {
+	Win32Application::~Win32Application() {
+		Win32ShutdownGdiplus();
+	}
+
+	void Win32Application::Initialize() {
+		Win32StartupGdiplus();
+	}
 	int Win32Application::Run() {
 		MSG message;
 		while (GetMessage(&message, nullptr, 0, 0)) {
