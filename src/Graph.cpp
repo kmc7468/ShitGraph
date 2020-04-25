@@ -105,7 +105,7 @@ namespace ShitGraph {
 			const std::vector<Line> lines = graph->Sample(samplingContext);
 			for (const Line& line : lines) {
 				if (line.size() == 1) {
-					device.DrawPoint(graphBrush, line.front(), graph->Width);
+					device.DrawPoint(graphBrush, line.front(), graph->Width / 2);
 				} else if (line.size() > 1) {
 					device.DrawLines(graphPen, line.data(), line.size());
 				}

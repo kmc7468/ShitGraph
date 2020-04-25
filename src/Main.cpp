@@ -14,12 +14,12 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 	Renderer* renderer = new Renderer;
 	Graphs& graphs = renderer->GetGraphs();
 
-	graphs.AddGraph(CreateXAxis());
-	graphs.AddGraph(CreateYAxis());
+	/*graphs.AddGraph(CreateXAxis());
+	graphs.AddGraph(CreateYAxis());*/
 
-	graphs.AddGraph(CreatePolynomial({ -6, 11, -6, 1 })->ChangeColor(RandomColor()));
-	graphs.AddGraph(CreateEllipse(0, 0, 1, 1)->ChangeColor(RandomColor()));
-	graphs.AddGraph(CreateCFunction(std::sin)->ChangeColor(RandomColor()));
+	//graphs.AddGraph(CreatePolynomial({ -6, 11, -6, 1 })->ChangeColor(RandomColor()));
+	graphs.AddGraph(CreateEllipse(0, 0, 2, 2)->ChangeColor(RandomColor()));
+	/*graphs.AddGraph(CreateCFunction(std::sin)->ChangeColor(RandomColor()));
 	graphs.AddGraph(CreateCFunction(std::cos)->ChangeColor(RandomColor()));
 	graphs.AddGraph(CreateCFunction(std::log2)->ChangeColor(RandomColor()));
 	graphs.AddGraph(CreateCFunction([](Scalar x) {
@@ -55,7 +55,35 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 
 	graphs.AddGraph(CreateCFunction(std::tan, [](const Point& from, const Point& to) {
 		return from.Y < to.Y;
-	})->ChangeColor(RandomColor()));
+	})->ChangeColor(RandomColor()));*/
+
+	//graphs.AddGraph(CreatePolynomial({ 1, 1 })->ChangeColor(RandomColor()));
+
+	ImplicitFunctionClass fClass;
+	fClass.CheckContinuity = ContinuousFunction;
+	fClass.Parameter = nullptr;
+	fClass.Color = RandomColor();
+	fClass.Function = [](const FunctionParameter*, const Point& point) {
+		return std::pow(point.X, 2) + std::pow(point.Y, 2) - 1;
+		//return std::sin(point.X) - std::cos(point.Y);
+		//return point.Y - point.X;
+		//return 1 / (point.Y - 1) - 1;
+		//return point.Y * std::sin(point.X) + point.X * std::cos(point.Y) - 1;
+		//return std::sqrt(std::pow(point.X, 2) + std::pow(point.Y, 2)) - std::atan(point.Y / point.X);
+		//return std::pow(point.X, 3) + 3 * point.X - std::pow(point.Y, 2) +3;
+	};
+	graphs.AddGraph(new ImplicitFunctionGraph(fClass));
+
+	/*fClass.CheckContinuity = [](const Point& from, const Point& to) {
+		return from.Y < to.Y;
+	};*/
+	fClass.Color = RandomColor();
+	fClass.Function = [](const FunctionParameter*, const Point& point) {
+		return point.Y - std::tan(point.X);
+	};
+	//graphs.AddGraph(new ImplicitFunctionGraph(fClass));
+
+	/* Guarder */
 
 	Win32Application application;
 	application.Initialize();

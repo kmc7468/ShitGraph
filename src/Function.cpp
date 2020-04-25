@@ -1,5 +1,7 @@
 #include <ShitGraph/Function.hpp>
 
+#include <cmath>
+
 namespace ShitGraph {
 	FunctionParameter::~FunctionParameter() {}
 
@@ -93,14 +95,64 @@ namespace ShitGraph {
 
 namespace ShitGraph {
 	std::vector<Line> ImplicitFunctionSampler::Sample(const SamplingContext& context, const Graph* graph) const {
-		// TODO
-		return std::vector<Line>();
+		const int width = static_cast<int>(context.ViewportPhysical.RightBottom.X) + 1,
+			height = static_cast<int>(context.ViewportPhysical.RightBottom.Y) + 1;
+		std::vector<bool> signs(width * height);
+
+		for (int xP = 0; xP < width; ++xP) {
+			for (int yP = 0; yP < height; ++yP) {
+				static constexpr Scalar half = 0.5;
+				const Point point = context.Logical({ xP - half, yP - half });
+				signs[xP * height + yP] = std::signbit(Solve(graph, point.X, point.Y));
+			}
+		}
+
+		std::vector<Line> result;
+		std::vector<bool> processed((width - 1) * (height - 1));
+		Line* currentLine = nullptr;
+
+		for (int xP = 0; xP < width - 1; ++xP) {
+			for (int yP = 0; yP < height - 1; ++yP) {
+				if (processed[xP * (height - 1) + yP]) continue;
+				processed[xP * (height - 1) + yP] = true;
+
+				static constexpr bool isNear[4][4] = {
+					{ false, true, true, false },
+					{ true, false, false, true },
+					{ true, false, false, true },
+					{ false, true, true, false },
+				};
+				const bool vertex[4] = {
+					signs[xP * height + yP], signs[(xP + 1) * height + yP],
+					signs[xP * height + yP + 1], signs[(xP + 1) * height + yP + 1],
+				};
+				for (int i = 0; i < 4; ++i) {
+					for (int j = 0; j < 4; ++j) {
+						if (!isNear[i][j] || vertex[i] == vertex[j]) continue;
+						
+						//if (!currentLine) {
+							currentLine = &result.emplace_back();
+						//}
+						currentLine->push_back({ static_cast<Scalar>(xP), static_cast<Scalar>(yP) });
+						goto br;
+					}
+				}
+			br:;
+			}
+		}
+
+		SeparateLines(context, graph, result);
+		return result;
+	}
+
+	Scalar ImplicitFunctionSampler::Solve(const Graph* graph, Scalar x, Scalar y) const {
+		return static_cast<const ImplicitFunctionGraph*>(graph)->Solve({ x, y });
 	}
 
 	ImplicitFunctionGraph::ImplicitFunctionGraph(const ImplicitFunctionClass& graphClass) noexcept
 		: FunctionGraph(new ImplicitFunctionSampler, graphClass), m_Function(graphClass.Function) {}
 
-	bool ImplicitFunctionGraph::CheckTrue(const Point& point) const {
-		return m_Function(point);
+	Scalar ImplicitFunctionGraph::Solve(const Point& point) const {
+		return m_Function(GetParameter(), point);
 	}
 }

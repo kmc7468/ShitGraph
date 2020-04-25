@@ -128,9 +128,12 @@ namespace ShitGraph {
 
 	public:
 		virtual std::vector<Line> Sample(const SamplingContext& context, const Graph* graph) const override;
+
+	private:
+		Scalar Solve(const Graph* graph, Scalar x, Scalar y) const;
 	};
 
-	using ImplicitFunction = bool(*)(const Point& point);
+	using ImplicitFunction = Scalar(*)(const FunctionParameter* parameter, const Point& point);
 
 	struct ImplicitFunctionClass : FunctionGraphClass {
 		ImplicitFunction Function = nullptr;
@@ -149,6 +152,6 @@ namespace ShitGraph {
 		ImplicitFunctionGraph& operator=(const ImplicitFunctionGraph&) = delete;
 
 	public:
-		bool CheckTrue(const Point& point) const;
+		Scalar Solve(const Point& point) const;
 	};
 }
