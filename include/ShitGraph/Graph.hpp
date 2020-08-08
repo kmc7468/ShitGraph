@@ -92,7 +92,7 @@ namespace ShitGraph {
 		Scalar m_Scale;
 
 	public:
-		Graphs(Scalar scale = 0.262144) noexcept;
+		Graphs(Scalar scale) noexcept;
 		Graphs(const Graphs&) = delete;
 		~Graphs() = default;
 
@@ -130,7 +130,7 @@ namespace ShitGraph {
 		static constexpr Scalar MAGNIFICATION = 1 / 0.75;
 
 	private:
-		Graphs m_Graphs;
+		Graphs m_Graphs{ INITIALLY_SCALE };
 		std::optional<std::size_t> m_CurrentIndex;
 		bool m_OriginalVisible = true;
 
