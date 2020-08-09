@@ -33,105 +33,105 @@ namespace ShitGraph {
 	};
 }
 
-namespace ShitGraph::terms {
-	class Number final : public Term {
+namespace ShitGraph {
+	class NumberTerm final : public Term {
 	public:
 		Scalar Value = 0;
 
 	public:
-		Number() noexcept = default;
-		Number(Scalar value) noexcept;
-		Number(const Number&) = delete;
-		virtual ~Number() override = default;
+		NumberTerm() noexcept = default;
+		NumberTerm(Scalar value) noexcept;
+		NumberTerm(const NumberTerm&) = delete;
+		virtual ~NumberTerm() override = default;
 
 	public:
-		Number& operator=(const Number&) = delete;
+		NumberTerm& operator=(const NumberTerm&) = delete;
 	};
 
-	class Variable final : public Term {
+	class VariableTerm final : public Term {
 	public:
 		char Character = 0;
 		Term* Subscript = nullptr;
 
 	public:
-		explicit Variable(char character) noexcept;
-		Variable(char character, Term* subscript) noexcept;
-		Variable(const Variable&) = delete;
-		virtual ~Variable() override;
+		explicit VariableTerm(char character) noexcept;
+		VariableTerm(char character, Term* subscript) noexcept;
+		VariableTerm(const VariableTerm&) = delete;
+		virtual ~VariableTerm() override;
 
 	public:
-		Variable& operator=(const Variable&) = delete;
+		VariableTerm& operator=(const VariableTerm&) = delete;
 	};
 
-	class Fraction final : public Term {
+	class FractionTerm final : public Term {
 	public:
 		Expression* Numerator = nullptr;
 		Expression* Denominator = nullptr;
 
 	public:
-		Fraction(Expression* numerator, Expression* denominator) noexcept;
-		Fraction(const Fraction&) = delete;
-		virtual ~Fraction() override;
+		FractionTerm(Expression* numerator, Expression* denominator) noexcept;
+		FractionTerm(const FractionTerm&) = delete;
+		virtual ~FractionTerm() override;
 
 	public:
-		Fraction& operator=(const Fraction&) = delete;
+		FractionTerm& operator=(const FractionTerm&) = delete;
 	};
 
-	class Parentheses final : public Term {
+	class ParenthesesTerm final : public Term {
 	public:
 		ShitGraph::Expression* Expression = nullptr;
 
 	public:
-		Parentheses(ShitGraph::Expression* expression) noexcept;
-		Parentheses(const Parentheses&) = delete;
-		virtual ~Parentheses() override;
+		ParenthesesTerm(ShitGraph::Expression* expression) noexcept;
+		ParenthesesTerm(const ParenthesesTerm&) = delete;
+		virtual ~ParenthesesTerm() override;
 
 	public:
-		Parentheses& operator=(const Parentheses&) = delete;
+		ParenthesesTerm& operator=(const ParenthesesTerm&) = delete;
 	};
 
-	class Sign final : public Term {
+	class SignTerm final : public Term {
 	public:
 		bool IsNegative = false;
 		ShitGraph::Term* Term = nullptr;
 
 	public:
-		explicit Sign(ShitGraph::Term* term) noexcept;
-		Sign(bool isNegative, ShitGraph::Term* term) noexcept;
-		Sign(const Sign&) = delete;
-		virtual ~Sign() override;
+		explicit SignTerm(ShitGraph::Term* term) noexcept;
+		SignTerm(bool isNegative, ShitGraph::Term* term) noexcept;
+		SignTerm(const SignTerm&) = delete;
+		virtual ~SignTerm() override;
 
 	public:
-		Sign& operator=(const Sign&) = delete;
+		SignTerm& operator=(const SignTerm&) = delete;
 	};
 
-	class Multiplication final : public Term {
+	class MultiplicationTerm final : public Term {
 	public:
 		Term* Left = nullptr;
 		Term* Right = nullptr;
 		bool HasDot = false;
 
 	public:
-		Multiplication(Term* left, Term* right) noexcept;
-		Multiplication(Term* left, Term* right, bool hasDot) noexcept;
-		Multiplication(const Multiplication&) = delete;
-		virtual ~Multiplication() override = default;
+		MultiplicationTerm(Term* left, Term* right) noexcept;
+		MultiplicationTerm(Term* left, Term* right, bool hasDot) noexcept;
+		MultiplicationTerm(const MultiplicationTerm&) = delete;
+		virtual ~MultiplicationTerm() override = default;
 
 	public:
-		Multiplication& operator=(const Multiplication&) = delete;
+		MultiplicationTerm& operator=(const MultiplicationTerm&) = delete;
 	};
 
-	class Exponentiation final : public Term {
+	class ExponentiationTerm final : public Term {
 	public:
 		Term* Base = nullptr;
 		Term* Exponent = nullptr;
 
 	public:
-		Exponentiation(Term* base, Term* exponent) noexcept;
-		Exponentiation(const Exponentiation&) = delete;
-		virtual ~Exponentiation() override;
+		ExponentiationTerm(Term* base, Term* exponent) noexcept;
+		ExponentiationTerm(const ExponentiationTerm&) = delete;
+		virtual ~ExponentiationTerm() override;
 
 	public:
-		Exponentiation& operator=(const Exponentiation&) = delete;
+		ExponentiationTerm& operator=(const ExponentiationTerm&) = delete;
 	};
 }

@@ -24,61 +24,61 @@ namespace ShitGraph {
 	}
 }
 
-namespace ShitGraph::terms {
-	Number::Number(Scalar value) noexcept
+namespace ShitGraph {
+	NumberTerm::NumberTerm(Scalar value) noexcept
 		: Value(value) {}
 }
 
-namespace ShitGraph::terms {
-	Variable::Variable(char character) noexcept
+namespace ShitGraph {
+	VariableTerm::VariableTerm(char character) noexcept
 		: Character(character) {}
-	Variable::Variable(char character, Term* subscript) noexcept
+	VariableTerm::VariableTerm(char character, Term* subscript) noexcept
 		: Character(character), Subscript(subscript) {
 		assert(this != subscript);
 	}
-	Variable::~Variable() {
+	VariableTerm::~VariableTerm() {
 		delete Subscript;
 	}
 }
 
-namespace ShitGraph::terms {
-	Fraction::Fraction(Expression* numerator, Expression* denominator) noexcept
+namespace ShitGraph {
+	FractionTerm::FractionTerm(Expression* numerator, Expression* denominator) noexcept
 		: Numerator(numerator), Denominator(denominator) {}
-	Fraction::~Fraction() {
+	FractionTerm::~FractionTerm() {
 		delete Numerator;
 		delete Denominator;
 	}
 }
 
-namespace ShitGraph::terms {
-	Parentheses::Parentheses(ShitGraph::Expression* expression) noexcept
+namespace ShitGraph {
+	ParenthesesTerm::ParenthesesTerm(ShitGraph::Expression* expression) noexcept
 		: Expression(expression) {}
-	Parentheses::~Parentheses() {
+	ParenthesesTerm::~ParenthesesTerm() {
 		delete Expression;
 	}
 }
 
-namespace ShitGraph::terms {
-	Sign::Sign(ShitGraph::Term* term) noexcept
+namespace ShitGraph {
+	SignTerm::SignTerm(ShitGraph::Term* term) noexcept
 		: Term(term) {}
-	Sign::Sign(bool isNegative, ShitGraph::Term* term) noexcept
+	SignTerm::SignTerm(bool isNegative, ShitGraph::Term* term) noexcept
 		: IsNegative(isNegative), Term(term) {}
-	Sign::~Sign() {
+	SignTerm::~SignTerm() {
 		delete Term;
 	}
 }
 
-namespace ShitGraph::terms {
-	Multiplication::Multiplication(Term* left, Term* right) noexcept
+namespace ShitGraph {
+	MultiplicationTerm::MultiplicationTerm(Term* left, Term* right) noexcept
 		: Left(left), Right(right) {}
-	Multiplication::Multiplication(Term* left, Term* right, bool hasDot) noexcept
+	MultiplicationTerm::MultiplicationTerm(Term* left, Term* right, bool hasDot) noexcept
 		: Left(left), Right(right), HasDot(hasDot) {}
 }
 
-namespace ShitGraph::terms {
-	Exponentiation::Exponentiation(Term* base, Term* exponent) noexcept
+namespace ShitGraph {
+	ExponentiationTerm::ExponentiationTerm(Term* base, Term* exponent) noexcept
 		: Base(base), Exponent(exponent) {}
-	Exponentiation::~Exponentiation() {
+	ExponentiationTerm::~ExponentiationTerm() {
 		delete Base;
 		delete Exponent;
 	}
