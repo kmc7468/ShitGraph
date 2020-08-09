@@ -67,3 +67,19 @@ namespace ShitGraph::terms {
 		delete Term;
 	}
 }
+
+namespace ShitGraph::terms {
+	Multiplication::Multiplication(Term* left, Term* right) noexcept
+		: Left(left), Right(right) {}
+	Multiplication::Multiplication(Term* left, Term* right, bool hasDot) noexcept
+		: Left(left), Right(right), HasDot(hasDot) {}
+}
+
+namespace ShitGraph::terms {
+	Exponentiation::Exponentiation(Term* base, Term* exponent) noexcept
+		: Base(base), Exponent(exponent) {}
+	Exponentiation::~Exponentiation() {
+		delete Base;
+		delete Exponent;
+	}
+}

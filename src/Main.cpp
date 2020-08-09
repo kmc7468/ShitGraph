@@ -1,7 +1,6 @@
 #define _USE_MATH_DEFINES
 
 #include <ShitGraph/CoreType.hpp>
-#include <ShitGraph/Expression.hpp>
 #include <ShitGraph/Graph.hpp>
 #include <ShitGraph/Graphs.hpp>
 #include <ShitGraph/platform/win32/Window.hpp>
@@ -22,8 +21,6 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int cmdShow) {
 	graphs.AddGraph(CreateCFunction(std::sin)->ChangeColor(RandomColor()));
 	graphs.AddGraph(CreateCFunction(std::cos)->ChangeColor(RandomColor()));
 	graphs.AddGraph(CreateCFunction(std::log2)->ChangeColor(RandomColor()));
-
-	terms::Variable v('x');
 
 	Win32Application application;
 	application.Initialize();

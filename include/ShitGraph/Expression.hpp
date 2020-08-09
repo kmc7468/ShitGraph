@@ -104,4 +104,34 @@ namespace ShitGraph::terms {
 	public:
 		Sign& operator=(const Sign&) = delete;
 	};
+
+	class Multiplication final : public Term {
+	public:
+		Term* Left = nullptr;
+		Term* Right = nullptr;
+		bool HasDot = false;
+
+	public:
+		Multiplication(Term* left, Term* right) noexcept;
+		Multiplication(Term* left, Term* right, bool hasDot) noexcept;
+		Multiplication(const Multiplication&) = delete;
+		virtual ~Multiplication() override = default;
+
+	public:
+		Multiplication& operator=(const Multiplication&) = delete;
+	};
+
+	class Exponentiation final : public Term {
+	public:
+		Term* Base = nullptr;
+		Term* Exponent = nullptr;
+
+	public:
+		Exponentiation(Term* base, Term* exponent) noexcept;
+		Exponentiation(const Exponentiation&) = delete;
+		virtual ~Exponentiation() override;
+
+	public:
+		Exponentiation& operator=(const Exponentiation&) = delete;
+	};
 }
