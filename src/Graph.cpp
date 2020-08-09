@@ -250,7 +250,7 @@ namespace ShitGraph {
 
 	void Renderer::SetVisible(Window& window, bool newVisible) noexcept {
 		if (m_CurrentIndex && m_OriginalVisible != newVisible) {
-			newVisible = m_OriginalVisible;
+			m_OriginalVisible = newVisible;
 			window.ReDraw();
 		}
 	}
