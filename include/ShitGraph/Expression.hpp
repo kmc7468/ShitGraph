@@ -16,20 +16,13 @@ namespace ShitGraph {
 	};
 
 	class Expression {
-	private:
-		std::vector<Term*> m_Terms;
-
 	public:
 		Expression() noexcept = default;
 		Expression(const Expression&) = delete;
-		virtual ~Expression();
+		virtual ~Expression() = 0;
 
 	public:
 		Expression& operator=(const Expression&) = delete;
-
-	public:
-		void AddTerm(Term* term);
-		void RemoveTerm(Term* term);
 	};
 }
 
@@ -63,13 +56,15 @@ namespace ShitGraph {
 		VariableTerm& operator=(const VariableTerm&) = delete;
 	};
 
+	class Terms;
+
 	class FractionTerm final : public Term {
 	public:
-		Expression* Numerator = nullptr;
-		Expression* Denominator = nullptr;
+		Terms* Numerator = nullptr;
+		Terms* Denominator = nullptr;
 
 	public:
-		FractionTerm(Expression* numerator, Expression* denominator) noexcept;
+		FractionTerm(Terms* numerator, Terms* denominator) noexcept;
 		FractionTerm(const FractionTerm&) = delete;
 		virtual ~FractionTerm() override;
 
@@ -79,10 +74,10 @@ namespace ShitGraph {
 
 	class ParenthesesTerm final : public Term {
 	public:
-		ShitGraph::Expression* Expression = nullptr;
+		Terms* Expression = nullptr;
 
 	public:
-		ParenthesesTerm(ShitGraph::Expression* expression) noexcept;
+		ParenthesesTerm(Terms* expression) noexcept;
 		ParenthesesTerm(const ParenthesesTerm&) = delete;
 		virtual ~ParenthesesTerm() override;
 
@@ -133,5 +128,24 @@ namespace ShitGraph {
 
 	public:
 		ExponentiationTerm& operator=(const ExponentiationTerm&) = delete;
+	};
+}
+
+namespace ShitGraph {
+	class Terms final : public Expression {
+	private:
+		std::vector<Term*> m_Terms;
+
+	public:
+		Terms() noexcept = default;
+		Terms(const Terms&) = delete;
+		virtual ~Terms();
+
+	public:
+		Terms& operator=(const Terms&) = delete;
+
+	public:
+		void AddTerm(Term* term);
+		void RemoveTerm(Term* term);
 	};
 }

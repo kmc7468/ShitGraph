@@ -8,20 +8,7 @@ namespace ShitGraph {
 }
 
 namespace ShitGraph {
-	Expression::~Expression() {
-		for (Term* term : m_Terms) {
-			delete term;
-		}
-	}
-
-	void Expression::AddTerm(Term* term) {
-		m_Terms.push_back(term);
-	}
-	void Expression::RemoveTerm(Term* term) {
-		const auto iter = std::find(m_Terms.begin(), m_Terms.end(), term);
-		assert(iter != m_Terms.end());
-		m_Terms.erase(iter);
-	}
+	Expression::~Expression() {}
 }
 
 namespace ShitGraph {
@@ -42,7 +29,7 @@ namespace ShitGraph {
 }
 
 namespace ShitGraph {
-	FractionTerm::FractionTerm(Expression* numerator, Expression* denominator) noexcept
+	FractionTerm::FractionTerm(Terms* numerator, Terms* denominator) noexcept
 		: Numerator(numerator), Denominator(denominator) {}
 	FractionTerm::~FractionTerm() {
 		delete Numerator;
@@ -51,7 +38,7 @@ namespace ShitGraph {
 }
 
 namespace ShitGraph {
-	ParenthesesTerm::ParenthesesTerm(ShitGraph::Expression* expression) noexcept
+	ParenthesesTerm::ParenthesesTerm(Terms* expression) noexcept
 		: Expression(expression) {}
 	ParenthesesTerm::~ParenthesesTerm() {
 		delete Expression;
@@ -81,5 +68,22 @@ namespace ShitGraph {
 	ExponentiationTerm::~ExponentiationTerm() {
 		delete Base;
 		delete Exponent;
+	}
+}
+
+namespace ShitGraph {
+	Terms::~Terms() {
+		for (Term* term : m_Terms) {
+			delete term;
+		}
+	}
+
+	void Terms::AddTerm(Term* term) {
+		m_Terms.push_back(term);
+	}
+	void Terms::RemoveTerm(Term* term) {
+		const auto iter = std::find(m_Terms.begin(), m_Terms.end(), term);
+		assert(iter != m_Terms.end());
+		m_Terms.erase(iter);
 	}
 }
