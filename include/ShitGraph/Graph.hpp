@@ -161,7 +161,7 @@ namespace ShitGraph {
 		virtual void KeyDown(KeyEventArgs e) override;
 
 	private:
-		void SetVisible(Window& window, bool newVisible) noexcept;
+		void SetVisible(Control& control, bool newVisible) noexcept;
 		void Select(std::size_t index);
 		void Unselect(std::size_t index);
 	};

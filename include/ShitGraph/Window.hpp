@@ -3,11 +3,11 @@
 #include <ShitGraph/CoreType.hpp>
 
 namespace ShitGraph {
-	class Window;
+	class Control;
 	class GraphicDevice;
 
 	struct EventArgs {
-		ShitGraph::Window& Window;
+		ShitGraph::Control& Control;
 	};
 
 	struct PaintEventArgs final : EventArgs {
@@ -65,22 +65,21 @@ namespace ShitGraph {
 }
 
 namespace ShitGraph {
-	class Window {
+	class Control {
 	private:
 		EventAdaptor* m_EventAdaptor = nullptr;
 
 	public:
-		explicit Window(EventAdaptor* eventAdaptor) noexcept;
-		Window(const Window&) = delete;
-		virtual ~Window();
+		explicit Control(EventAdaptor* eventAdaptor) noexcept;
+		Control(const Control&) = delete;
+		virtual ~Control();
 
 	public:
-		Window& operator=(const Window&) = delete;
+		Control& operator=(const Control&) = delete;
 
 	public:
 		virtual void Show() = 0;
 		virtual void Hide() = 0;
-		virtual void Exit() = 0;
 		virtual void ReDraw() = 0;
 		virtual Rectangle GetClientRect() const noexcept = 0;
 
@@ -94,6 +93,19 @@ namespace ShitGraph {
 		void MouseWheel(int delta, bool controlKey);
 
 		void KeyDown(int key);
+	};
+
+	class Window : public Control {
+	public:
+		explicit Window(EventAdaptor* eventAdaptor) noexcept;
+		Window(const Window&) = delete;
+		virtual ~Window() override = default;
+
+	public:
+		Window& operator=(const Window&) = delete;
+
+	public:
+		virtual void Exit() = 0;
 	};
 }
 

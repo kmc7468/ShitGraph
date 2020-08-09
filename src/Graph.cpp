@@ -157,7 +157,8 @@ namespace ShitGraph {
 		}
 	}
 	void Renderer::Destroy(EventArgs e) {
-		e.Window.Exit();
+		assert(dynamic_cast<Window*>(&e.Control) != nullptr);
+		static_cast<Window&>(e.Control).Exit();
 	}
 
 	void Renderer::MouseDown(MouseEventArgs e) {
@@ -175,13 +176,13 @@ namespace ShitGraph {
 				center.X - (m_MouseX - e.X) * m_Graphs.GetScale(),
 				center.Y + (m_MouseY - e.Y) * m_Graphs.GetScale()
 			});
-			e.Window.ReDraw();
+			e.Control.ReDraw();
 		}
 		m_MouseX = e.X;
 		m_MouseY = e.Y;
 	}
 	void Renderer::MouseWheel(MouseWheelEventArgs e) {
-		const Rectangle clientRect = e.Window.GetClientRect();
+		const Rectangle clientRect = e.Control.GetClientRect();
 		const Point mouse = m_Graphs.Logical(static_cast<int>(clientRect.RightBottom.X), static_cast<int>(clientRect.RightBottom.Y),
 			{ static_cast<Scalar>(m_MouseX), static_cast<Scalar>(m_MouseY) });
 		const Scalar delta = e.Delta > 0 ? 1 / MAGNIFICATION : MAGNIFICATION;
@@ -197,61 +198,61 @@ namespace ShitGraph {
 			});
 		}
 
-		e.Window.ReDraw();
+		e.Control.ReDraw();
 	}
 
 	void Renderer::KeyDown(KeyEventArgs e) {
 		switch (e.Key) {
 		case 'O':
 			m_Graphs.SetCenter({ 0, 0 });
-			e.Window.ReDraw();
+			e.Control.ReDraw();
 			break;
 
 		case 'R':
 			m_Graphs.SetScale(INITIALLY_SCALE);
-			e.Window.ReDraw();
+			e.Control.ReDraw();
 			break;
 
 		case EscKey:
 			if (m_CurrentIndex) {
 				Unselect(*m_CurrentIndex);
 				m_CurrentIndex.reset();
-				e.Window.ReDraw();
+				e.Control.ReDraw();
 			}
 			break;
 
-		case UpKey: SetVisible(e.Window, true); break;
-		case DownKey: SetVisible(e.Window, false); break;
+		case UpKey: SetVisible(e.Control, true); break;
+		case DownKey: SetVisible(e.Control, false); break;
 
 		case LeftKey:
 			if (!m_CurrentIndex && m_Graphs.GetGraphCount()) {
 				const auto index = m_Graphs.GetGraphCount() - 1;
 				Select((m_CurrentIndex = index, index));
-				e.Window.ReDraw();
+				e.Control.ReDraw();
 			} else if (m_CurrentIndex && *m_CurrentIndex) {
 				Unselect(*m_CurrentIndex);
 				Select(*m_CurrentIndex -= 1);
-				e.Window.ReDraw();
+				e.Control.ReDraw();
 			}
 			break;
 
 		case RightKey:
 			if (!m_CurrentIndex && m_Graphs.GetGraphCount()) {
 				Select((m_CurrentIndex = 0, 0));
-				e.Window.ReDraw();
+				e.Control.ReDraw();
 			} else if (m_CurrentIndex && m_CurrentIndex < m_Graphs.GetGraphCount() - 1) {
 				Unselect(*m_CurrentIndex);
 				Select(*m_CurrentIndex += 1);
-				e.Window.ReDraw();
+				e.Control.ReDraw();
 			}
 			break;
 		}
 	}
 
-	void Renderer::SetVisible(Window& window, bool newVisible) noexcept {
+	void Renderer::SetVisible(Control& control, bool newVisible) noexcept {
 		if (m_CurrentIndex && m_OriginalVisible != newVisible) {
 			newVisible = m_OriginalVisible;
-			window.ReDraw();
+			control.ReDraw();
 		}
 	}
 	void Renderer::Select(std::size_t index) {

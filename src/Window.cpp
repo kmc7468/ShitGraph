@@ -15,42 +15,47 @@ namespace ShitGraph {
 }
 
 namespace ShitGraph {
-	Window::Window(EventAdaptor* eventAdaptor) noexcept
+	Control::Control(EventAdaptor* eventAdaptor) noexcept
 		: m_EventAdaptor(eventAdaptor) {
 		assert(eventAdaptor);
 	}
-	Window::~Window() {
+	Control::~Control() {
 		delete m_EventAdaptor;
 	}
 
-	void Window::Paint(GraphicDevice& device) {
+	void Control::Paint(GraphicDevice& device) {
 		PaintEventArgs e{ *this, device };
 		m_EventAdaptor->Paint(e);
 	}
-	void Window::Destroy() {
+	void Control::Destroy() {
 		EventArgs e{ *this };
 		m_EventAdaptor->Destroy(e);
 	}
 
-	void Window::MouseDown(int x, int y, MouseButton button) {
+	void Control::MouseDown(int x, int y, MouseButton button) {
 		MouseEventArgs e{ *this, x, y, button };
 		m_EventAdaptor->MouseDown(e);
 	}
-	void Window::MouseUp(int x, int y, MouseButton button) {
+	void Control::MouseUp(int x, int y, MouseButton button) {
 		MouseEventArgs e{ *this, x, y, button };
 		m_EventAdaptor->MouseUp(e);
 	}
-	void Window::MouseMove(int x, int y) {
+	void Control::MouseMove(int x, int y) {
 		MouseEventArgs e{ *this, x, y, MouseButton::None };
 		m_EventAdaptor->MouseMove(e);
 	}
-	void Window::MouseWheel(int delta, bool controlKey) {
+	void Control::MouseWheel(int delta, bool controlKey) {
 		MouseWheelEventArgs e{ *this, delta, controlKey };
 		m_EventAdaptor->MouseWheel(e);
 	}
 
-	void Window::KeyDown(int key) {
+	void Control::KeyDown(int key) {
 		KeyEventArgs e{ *this, key };
 		m_EventAdaptor->KeyDown(e);
 	}
+}
+
+namespace ShitGraph {
+	Window::Window(EventAdaptor* eventAdaptor) noexcept
+		: Control(eventAdaptor) {}
 }
