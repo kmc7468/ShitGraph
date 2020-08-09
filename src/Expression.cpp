@@ -2,10 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
-
-namespace ShitGraph {
-	Term::~Term() {}
-}
+#include <cmath>
 
 namespace ShitGraph {
 	Expression::~Expression() {}
@@ -14,6 +11,10 @@ namespace ShitGraph {
 namespace ShitGraph {
 	NumberTerm::NumberTerm(Scalar value) noexcept
 		: Value(value) {}
+
+	Scalar NumberTerm::Evaluate(const VariableTable&) noexcept {
+		return Value;
+	}
 }
 
 namespace ShitGraph {
@@ -26,6 +27,10 @@ namespace ShitGraph {
 	VariableTerm::~VariableTerm() {
 		delete Subscript;
 	}
+
+	Scalar VariableTerm::Evaluate(const VariableTable& table) noexcept {
+		return table.at(this);
+	}
 }
 
 namespace ShitGraph {
@@ -35,6 +40,10 @@ namespace ShitGraph {
 		delete Numerator;
 		delete Denominator;
 	}
+
+	Scalar FractionTerm::Evaluate(const VariableTable& table) noexcept {
+		return Numerator->Evaluate(table) / Denominator->Evaluate(table);
+	}
 }
 
 namespace ShitGraph {
@@ -43,15 +52,24 @@ namespace ShitGraph {
 	ParenthesesTerm::~ParenthesesTerm() {
 		delete Expression;
 	}
+
+	Scalar ParenthesesTerm::Evaluate(const VariableTable& table) noexcept {
+		return Expression->Evaluate(table);
+	}
 }
 
 namespace ShitGraph {
 	SignTerm::SignTerm(ShitGraph::Term* term) noexcept
-		: Term(term) {}
+		: Expression(term) {}
 	SignTerm::SignTerm(bool isNegative, ShitGraph::Term* term) noexcept
-		: IsNegative(isNegative), Term(term) {}
+		: IsNegative(isNegative), Expression(term) {}
 	SignTerm::~SignTerm() {
-		delete Term;
+		delete Expression;
+	}
+
+	Scalar SignTerm::Evaluate(const VariableTable& table) noexcept {
+		const Scalar evaluated = Expression->Evaluate(table);
+		return IsNegative ? -evaluated : evaluated;
 	}
 }
 
@@ -60,6 +78,10 @@ namespace ShitGraph {
 		: Left(left), Right(right) {}
 	MultiplicationTerm::MultiplicationTerm(Term* left, Term* right, bool hasDot) noexcept
 		: Left(left), Right(right), HasDot(hasDot) {}
+
+	Scalar MultiplicationTerm::Evaluate(const VariableTable& table) noexcept {
+		return Left->Evaluate(table) * Right->Evaluate(table);
+	}
 }
 
 namespace ShitGraph {
@@ -68,6 +90,10 @@ namespace ShitGraph {
 	ExponentiationTerm::~ExponentiationTerm() {
 		delete Base;
 		delete Exponent;
+	}
+
+	Scalar ExponentiationTerm::Evaluate(const VariableTable& table) noexcept {
+		return std::pow(Base->Evaluate(table), Exponent->Evaluate(table));
 	}
 }
 
@@ -86,4 +112,18 @@ namespace ShitGraph {
 		assert(iter != m_Terms.end());
 		m_Terms.erase(iter);
 	}
+
+	Scalar Terms::Evaluate(const VariableTable& table) {
+		Scalar sum = 0;
+		for (Term* term : m_Terms) {
+			sum += term->Evaluate(table);
+		}
+		return sum;
+	}
+}
+
+namespace ShitGraph {
+	Equality::Equality(Terms* left, Terms* right) noexcept
+		: Left(left), Right(right) {}
+	Equality::~Equality() {}
 }

@@ -2,17 +2,25 @@
 
 #include <ShitGraph/CoreType.hpp>
 
+#include <unordered_map>
 #include <vector>
 
 namespace ShitGraph {
+	class VariableTerm;
+
+	using VariableTable = std::unordered_map<const VariableTerm*, Scalar>;
+
 	class Term {
 	public:
 		Term() noexcept = default;
 		Term(const Term&) = delete;
-		virtual ~Term() = 0;
+		virtual ~Term() = default;
 
 	public:
 		Term& operator=(const Term&) = delete;
+
+	public:
+		virtual Scalar Evaluate(const VariableTable& table) = 0;
 	};
 
 	class Expression {
@@ -39,6 +47,9 @@ namespace ShitGraph {
 
 	public:
 		NumberTerm& operator=(const NumberTerm&) = delete;
+
+	public:
+		virtual Scalar Evaluate(const VariableTable&) noexcept;
 	};
 
 	class VariableTerm final : public Term {
@@ -54,6 +65,9 @@ namespace ShitGraph {
 
 	public:
 		VariableTerm& operator=(const VariableTerm&) = delete;
+
+	public:
+		virtual Scalar Evaluate(const VariableTable& table) noexcept;
 	};
 
 	class Terms;
@@ -70,6 +84,9 @@ namespace ShitGraph {
 
 	public:
 		FractionTerm& operator=(const FractionTerm&) = delete;
+
+	public:
+		virtual Scalar Evaluate(const VariableTable& table) noexcept;
 	};
 
 	class ParenthesesTerm final : public Term {
@@ -83,12 +100,15 @@ namespace ShitGraph {
 
 	public:
 		ParenthesesTerm& operator=(const ParenthesesTerm&) = delete;
+
+	public:
+		virtual Scalar Evaluate(const VariableTable& table) noexcept;
 	};
 
 	class SignTerm final : public Term {
 	public:
 		bool IsNegative = false;
-		ShitGraph::Term* Term = nullptr;
+		ShitGraph::Term* Expression = nullptr;
 
 	public:
 		explicit SignTerm(ShitGraph::Term* term) noexcept;
@@ -98,6 +118,9 @@ namespace ShitGraph {
 
 	public:
 		SignTerm& operator=(const SignTerm&) = delete;
+
+	public:
+		virtual Scalar Evaluate(const VariableTable& table) noexcept;
 	};
 
 	class MultiplicationTerm final : public Term {
@@ -114,6 +137,9 @@ namespace ShitGraph {
 
 	public:
 		MultiplicationTerm& operator=(const MultiplicationTerm&) = delete;
+
+	public:
+		virtual Scalar Evaluate(const VariableTable& table) noexcept;
 	};
 
 	class ExponentiationTerm final : public Term {
@@ -128,6 +154,9 @@ namespace ShitGraph {
 
 	public:
 		ExponentiationTerm& operator=(const ExponentiationTerm&) = delete;
+
+	public:
+		virtual Scalar Evaluate(const VariableTable& table) noexcept;
 	};
 }
 
@@ -147,5 +176,21 @@ namespace ShitGraph {
 	public:
 		void AddTerm(Term* term);
 		void RemoveTerm(Term* term);
+
+		Scalar Evaluate(const VariableTable& table);
+	};
+
+	class Equality final : public Expression {
+	public:
+		Terms* Left = nullptr;
+		Terms* Right = nullptr;
+
+	public:
+		Equality(Terms* left, Terms* right) noexcept;
+		Equality(const Equality&) = delete;
+		virtual ~Equality() override;
+
+	public:
+		Equality& operator=(const Equality&) = delete;
 	};
 }
