@@ -24,12 +24,12 @@ namespace ShitGraph {
 	}
 }
 
-namespace ShitGraph {
+namespace ShitGraph::terms {
 	Number::Number(Scalar value) noexcept
 		: Value(value) {}
 }
 
-namespace ShitGraph {
+namespace ShitGraph::terms {
 	Variable::Variable(char character) noexcept
 		: Character(character) {}
 	Variable::Variable(char character, Term* subscript) noexcept
@@ -41,11 +41,29 @@ namespace ShitGraph {
 	}
 }
 
-namespace ShitGraph {
+namespace ShitGraph::terms {
 	Fraction::Fraction(Expression* numerator, Expression* denominator) noexcept
 		: Numerator(numerator), Denominator(denominator) {}
 	Fraction::~Fraction() {
 		delete Numerator;
 		delete Denominator;
+	}
+}
+
+namespace ShitGraph::terms {
+	Parentheses::Parentheses(ShitGraph::Expression* expression) noexcept
+		: Expression(expression) {}
+	Parentheses::~Parentheses() {
+		delete Expression;
+	}
+}
+
+namespace ShitGraph::terms {
+	Sign::Sign(ShitGraph::Term* term) noexcept
+		: Term(term) {}
+	Sign::Sign(bool isNegative, ShitGraph::Term* term) noexcept
+		: IsNegative(isNegative), Term(term) {}
+	Sign::~Sign() {
+		delete Term;
 	}
 }

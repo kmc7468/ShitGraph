@@ -33,7 +33,7 @@ namespace ShitGraph {
 	};
 }
 
-namespace ShitGraph {
+namespace ShitGraph::terms {
 	class Number final : public Term {
 	public:
 		Scalar Value = 0;
@@ -75,5 +75,33 @@ namespace ShitGraph {
 
 	public:
 		Fraction& operator=(const Fraction&) = delete;
+	};
+
+	class Parentheses final : public Term {
+	public:
+		ShitGraph::Expression* Expression = nullptr;
+
+	public:
+		Parentheses(ShitGraph::Expression* expression) noexcept;
+		Parentheses(const Parentheses&) = delete;
+		virtual ~Parentheses() override;
+
+	public:
+		Parentheses& operator=(const Parentheses&) = delete;
+	};
+
+	class Sign final : public Term {
+	public:
+		bool IsNegative = false;
+		ShitGraph::Term* Term = nullptr;
+
+	public:
+		explicit Sign(ShitGraph::Term* term) noexcept;
+		Sign(bool isNegative, ShitGraph::Term* term) noexcept;
+		Sign(const Sign&) = delete;
+		virtual ~Sign() override;
+
+	public:
+		Sign& operator=(const Sign&) = delete;
 	};
 }
