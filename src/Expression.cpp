@@ -25,13 +25,27 @@ namespace ShitGraph {
 }
 
 namespace ShitGraph {
+	Number::Number(Scalar value) noexcept
+		: Value(value) {}
+}
+
+namespace ShitGraph {
 	Variable::Variable(char character) noexcept
 		: Character(character) {}
-	Variable::Variable(char character, Variable* subscript) noexcept
+	Variable::Variable(char character, Term* subscript) noexcept
 		: Character(character), Subscript(subscript) {
 		assert(this != subscript);
 	}
 	Variable::~Variable() {
 		delete Subscript;
+	}
+}
+
+namespace ShitGraph {
+	Fraction::Fraction(Expression* numerator, Expression* denominator) noexcept
+		: Numerator(numerator), Denominator(denominator) {}
+	Fraction::~Fraction() {
+		delete Numerator;
+		delete Denominator;
 	}
 }

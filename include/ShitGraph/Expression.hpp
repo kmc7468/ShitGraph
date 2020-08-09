@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ShitGraph/CoreType.hpp>
+
 #include <vector>
 
 namespace ShitGraph {
@@ -32,18 +34,46 @@ namespace ShitGraph {
 }
 
 namespace ShitGraph {
+	class Number final : public Term {
+	public:
+		Scalar Value = 0;
+
+	public:
+		Number() noexcept = default;
+		Number(Scalar value) noexcept;
+		Number(const Number&) = delete;
+		virtual ~Number() override = default;
+
+	public:
+		Number& operator=(const Number&) = delete;
+	};
+
 	class Variable final : public Term {
 	public:
 		char Character = 0;
-		Variable* Subscript = nullptr;
+		Term* Subscript = nullptr;
 
 	public:
 		explicit Variable(char character) noexcept;
-		Variable(char character, Variable* subscript) noexcept;
+		Variable(char character, Term* subscript) noexcept;
 		Variable(const Variable&) = delete;
-		~Variable();
+		virtual ~Variable() override;
 
 	public:
 		Variable& operator=(const Variable&) = delete;
+	};
+
+	class Fraction final : public Term {
+	public:
+		Expression* Numerator = nullptr;
+		Expression* Denominator = nullptr;
+
+	public:
+		Fraction(Expression* numerator, Expression* denominator) noexcept;
+		Fraction(const Fraction&) = delete;
+		virtual ~Fraction() override;
+
+	public:
+		Fraction& operator=(const Fraction&) = delete;
 	};
 }
